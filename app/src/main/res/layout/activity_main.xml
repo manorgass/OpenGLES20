@@ -9,7 +9,7 @@
     <LinearLayout
         android:layout_width="300dp"
         android:id="@+id/opengl_container"
-        android:background="#000000"
+        android:background="@color/transParent"
         android:layout_height="300dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"

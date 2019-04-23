@@ -24,17 +24,12 @@ public class OpenGLES20Activity extends Activity {
 
         // Create a GLSurfaceView instance and set it
         // as the ContentView for this Activity.
-
         setContentView(R.layout.activity_main);
 
-
         glView = new MyGLSurfaceView(this);
-        glView.setZOrderOnTop(true);
-        /*glView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
-        glView.getHolder().setFormat(PixelFormat.RGBA_8888);*/
+
         LinearLayout openGlContainer = findViewById(R.id.opengl_container);
         openGlContainer.addView(glView);
-        //setContentView(glView);
     }
 
     public class MyGLSurfaceView extends GLSurfaceView {
@@ -49,12 +44,17 @@ public class OpenGLES20Activity extends Activity {
 
             renderer = new MyGLRenderer();
 
+            setZOrderOnTop(true);
+            // Set background transparent
+            setEGLConfigChooser(8, 8, 8, 8, 16, 0);
+            getHolder().setFormat(PixelFormat.RGBA_8888);
+
             // Set the Renderer for drawing on the GLSurfaceView
             setRenderer(renderer);
 
             // Render the view only when there is a change in the drawing data.
             // To allow the triangle to rotate automatically, this line is commented out:
-            setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+            //setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         }
 
         private final float TOUCH_SCALE_FACTOR = 180.0f / 320;
