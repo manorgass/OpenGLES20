@@ -7,7 +7,11 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
+
+import java.util.Random;
 
 /**
  * @author JungWon Kim
@@ -30,6 +34,32 @@ public class OpenGLES20Activity extends Activity {
 
         LinearLayout openGlContainer = findViewById(R.id.opengl_container);
         openGlContainer.addView(glView);
+
+        findViewById(R.id.switch_depth_buffer).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (v.getTag().equals("on")) {
+                    v.setTag("off");
+                    ((Button) v).setText("off");
+                    glView.queueEvent(new Runnable() {
+                        @Override
+                        public void run() {
+                            GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+                        }
+                    });
+
+                } else {
+                    v.setTag("on");
+                    ((Button) v).setText("on");
+                    glView.queueEvent(new Runnable() {
+                        @Override
+                        public void run() {
+                            GLES20.glDisable(GLES20.GL_DEPTH_TEST);
+                        }
+                    });
+                }
+            }
+        });
     }
 
     public class MyGLSurfaceView extends GLSurfaceView {

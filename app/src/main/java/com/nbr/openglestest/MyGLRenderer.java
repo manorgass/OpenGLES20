@@ -39,7 +39,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // Position the eye in front of the origin.
         final float eyeX = 0.0f;
         final float eyeY = 0.0f;
-        final float eyeZ = -4f;
+        final float eyeZ = 4f;
 
         // We are looking toward the distance
         final float lookX = 0.0f;
@@ -97,7 +97,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
         // this projection matrix is applied to object coordinates
         // in the onDrawFrame() method
-        Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1, 1, 3, 7);
+        Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1, 1, 1, 7);
     }
 
     private float[] rotationMatrix = new float[16];
