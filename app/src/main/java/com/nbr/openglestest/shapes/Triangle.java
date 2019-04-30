@@ -23,13 +23,13 @@ public class Triangle {
             // This matrix member variable provides a hook to manipulate
             // the coordinates of the objects that use this vertex shader
             "uniform mat4 uMVPMatrix;" +
-                    "attribute vec4 vPosition;" +
-                    "void main() {" +
-                    // the matrix must be included as a modifier of gl_Position
-                    // Note that the uMVPMatrix factor *must be first* in order
-                    // for the matrix multiplication product to be correct.
-                    "  gl_Position = uMVPMatrix * vPosition;" +
-                    "}";
+            "attribute vec4 vPosition;" +
+            "void main() {" +
+            // the matrix must be included as a modifier of gl_Position
+            // Note that the uMVPMatrix factor *must be first* in order
+            // for the matrix multiplication product to be correct.
+            "  gl_Position = uMVPMatrix * vPosition;" +
+            "}";
 
     private final String fragmentShaderCode =
             "precision mediump float;" +
@@ -54,8 +54,8 @@ public class Triangle {
             0.5f, -0.311004243f, 0.0f   // bottom right
     };
 
-    static private final float upZ = 0.05f;
-    static private final float downZ = -0.05f;
+    static private final float upZ = 0.03f;
+    static private final float downZ = -0.03f;
     static float arrowCoords[] = {   // in counterclockwise order:
             // 상단 헤드
             0, 0.4f, upZ,
@@ -220,7 +220,7 @@ public class Triangle {
     };
 
     // Set color with red, green, blue and alpha (opacity) values
-    float color[] = {0.63671875f, 0.76953125f, 0.22265625f, 1f};
+    float color[] = {0.63671875f, 0.76953125f, 0.22265625f, 1.0f};
     float colorLine[] = {0.0f, 0.0f, 0.0f, 1f};
 
 
@@ -262,35 +262,27 @@ public class Triangle {
     private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
 
     public void draw(float[] mvpMatrix) { // pass in the calculated transformation matrix
-        // Add program to OpenGL ES environment
         GLES20.glUseProgram(mProgram);
 
-        // get handle to vertex shader's vPosition member
         positionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
 
-        // Enable a handle to the triangle vertices
         GLES20.glEnableVertexAttribArray(positionHandle);
 
-        // Prepare the triangle coordinate data
         GLES20.glVertexAttribPointer(positionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false, vertexStride, vertexBuffer);
 
-        // get handle to fragment shader's vColor member
         colorHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
 
-        // Set color for drawing the triangle
         GLES20.glUniform4fv(colorHandle, 1, color, 0);
 
-        // get handle to shape's transformation matrix
         vPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
 
-        // Pass the projection and view transformation to the shader
         GLES20.glUniformMatrix4fv(vPMatrixHandle, 1, false, mvpMatrix, 0);
 
-        // Draw the triangle
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertexCount);
 
-        // Disable vertex array
         GLES20.glDisableVertexAttribArray(positionHandle);
+
+        drawLine(mvpMatrix);
     }
 
     public void drawLine(float[] mvpMatrix) {
@@ -318,7 +310,7 @@ public class Triangle {
         // Pass the projection and view transformation to the shader
         GLES20.glUniformMatrix4fv(vPMatrixHandle, 1, false, mvpMatrix, 0);
 
-        GLES20.glLineWidth(3);
+        GLES20.glLineWidth(5);
         // Draw the triangle
         GLES20.glDrawArrays(GLES20.GL_LINES, 0, arrowLineCoords.length / 3);
     }

@@ -6,11 +6,13 @@ import android.graphics.PixelFormat;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import java.io.IOException;
 import java.util.Random;
 
 /**
@@ -19,7 +21,7 @@ import java.util.Random;
  * @email manorgass@gmail.com
  */
 public class OpenGLES20Activity extends Activity {
-
+    private final String TAG = "OpenGLES20Activity";
     private GLSurfaceView glView;
 
     @Override
@@ -38,7 +40,25 @@ public class OpenGLES20Activity extends Activity {
         findViewById(R.id.switch_depth_buffer).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (v.getTag().equals("on")) {
+                Log.d(TAG, "onClick!");
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 1; i < 5000; i += 3) {
+                            renderer.setAngle((float)(i % 360));
+                            glView.requestRender();
+                            try {
+                                Thread.sleep(1);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            Log.d(TAG, "i: " + i + " / angle : " + renderer.getAngle());
+                        }
+                    }
+                }).start();
+
+
+               /* if (v.getTag().equals("on")) {
                     v.setTag("off");
                     ((Button) v).setText("off");
                     glView.queueEvent(new Runnable() {
@@ -57,14 +77,14 @@ public class OpenGLES20Activity extends Activity {
                             GLES20.glDisable(GLES20.GL_DEPTH_TEST);
                         }
                     });
-                }
+                }*/
             }
         });
     }
 
-    public class MyGLSurfaceView extends GLSurfaceView {
+    private MyGLRenderer renderer;
 
-        private final MyGLRenderer renderer;
+    public class MyGLSurfaceView extends GLSurfaceView {
 
         public MyGLSurfaceView(Context context) {
             super(context);
@@ -84,7 +104,7 @@ public class OpenGLES20Activity extends Activity {
 
             // Render the view only when there is a change in the drawing data.
             // To allow the triangle to rotate automatically, this line is commented out:
-            //setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+            setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         }
 
         private final float TOUCH_SCALE_FACTOR = 180.0f / 320;
@@ -96,6 +116,7 @@ public class OpenGLES20Activity extends Activity {
             // MotionEvent reports input details from the touch screen
             // and other input controls. In this case, you are only
             // interested in events where the touch position changed.
+
 
             float x = event.getX();
             float y = event.getY();
