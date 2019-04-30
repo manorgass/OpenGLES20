@@ -6,7 +6,6 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.SystemClock;
 
-import com.nbr.openglestest.shapes.Square;
 import com.nbr.openglestest.shapes.Triangle;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -22,9 +21,11 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private Triangle mTriangle;
 
     // vPMatrix is an abbreviation for "Model View Pprojection Matrix"
-    private final float[] vPMatrix = new float[16];
-    private final float[] projectionMatrix = new float[16];
-    private final float[] viewMatrix = new float[16];
+    private float[] vPMatrix = new float[16];
+    private float[] projectionMatrix = new float[16];
+    private float[] viewMatrix = new float[16];
+    private float[] mvpMatrix = new float[16];
+    private float[] modelMatrix = new float[16];
 
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
@@ -39,7 +40,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // Position the eye in front of the origin.
         final float eyeX = 0.0f;
         final float eyeY = 0.0f;
-        final float eyeZ = 4f;
+        final float eyeZ = 5.0f;
 
         // We are looking toward the distance
         final float lookX = 0.0f;
@@ -54,7 +55,10 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // Set the view matrix. This matrix can be said to represent the camera position.
         // NOTE: In OpenGL 1, a ModelView matrix is used, which is a combination of a model and
         // view matrix. In OpenGL 2, we can keep track of these matrices separately if we choose.
-        Matrix.setLookAtM(viewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
+        Matrix.setLookAtM(viewMatrix, 0,
+                eyeX, eyeY, eyeZ,
+                lookX, lookY, lookZ,
+                upX, upY, upZ);
 
         // Set the camera position (View matrix)
         //Matrix.setLookAtM(viewMatrix, 0, 0, 0, -3.7f, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
@@ -65,8 +69,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 unused) {
-        float[] scratch = new float[16];
-
         // Redraw background color
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
@@ -76,17 +78,46 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // Create a rotation transformation for the triangle
         long time = SystemClock.uptimeMillis() % 4000L;
         float angle = 0.090f * ((int) time);
-        Matrix.setRotateM(rotationMatrix, 0, angle, 0.1f, 0.1f, 0.1f);
 
-        // Combine the rotation matrix with the proejction and camera view
-        // Note that the vPMatrix factor *must be first* in order
-        // for the matrix multiplication product to be correct.
-        Matrix.multiplyMM(scratch, 0, vPMatrix, 0, rotationMatrix, 0);
+        Matrix.setIdentityM(modelMatrix, 0);
+        Matrix.translateM(modelMatrix, 0, 0.0f, 0.0f, 0.0f);
+        Matrix.rotateM(modelMatrix, 0, angle, 0.1f, 0.1f, 0.0f);
+        Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelMatrix, 0);
+        Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);
+        mTriangle.draw(mvpMatrix);
+        mTriangle.drawLine(mvpMatrix);
 
-        // Draw triangle
-        mTriangle.draw(scratch);
-        mTriangle.drawLine(scratch);
-        //mTriangle.draw(vPMatrix);
+        Matrix.setIdentityM(modelMatrix, 0);
+        Matrix.translateM(modelMatrix, 0, 1.5f, 0.0f, -1.0f);
+        Matrix.rotateM(modelMatrix, 0, angle, 0.0f, 1.0f, 1.0f);
+        Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelMatrix, 0);
+        Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);
+        mTriangle.draw(mvpMatrix);
+        mTriangle.drawLine(mvpMatrix);
+
+        Matrix.setIdentityM(modelMatrix, 0);
+        Matrix.translateM(modelMatrix, 0, -1.5f, 0.0f, -1.0f);
+        Matrix.rotateM(modelMatrix, 0, angle, 1.0f, 0.0f, 1.0f);
+        Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelMatrix, 0);
+        Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);
+        mTriangle.draw(mvpMatrix);
+        mTriangle.drawLine(mvpMatrix);
+
+        Matrix.setIdentityM(modelMatrix, 0);
+        Matrix.translateM(modelMatrix, 0, 0.0f, 1.5f, -1.0f);
+        Matrix.rotateM(modelMatrix, 0, angle, 1.0f, 0.4f, 0.2f);
+        Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelMatrix, 0);
+        Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);
+        mTriangle.draw(mvpMatrix);
+        mTriangle.drawLine(mvpMatrix);
+
+        Matrix.setIdentityM(modelMatrix, 0);
+        Matrix.translateM(modelMatrix, 0, 0.0f, -1.5f, -1.0f);
+        Matrix.rotateM(modelMatrix, 0, angle, 0.4f, 0.3f, 0.1f);
+        Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelMatrix, 0);
+        Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);
+        mTriangle.draw(mvpMatrix);
+        mTriangle.drawLine(mvpMatrix);
     }
 
     @Override
@@ -97,10 +128,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
         // this projection matrix is applied to object coordinates
         // in the onDrawFrame() method
-        Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1, 1, 1, 7);
+        Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1, 1, 2, 10);
     }
-
-    private float[] rotationMatrix = new float[16];
 
     public static int loadShader(int type, String shaderCode) {
         // create a vertex shader type (GLES20.GL_VERTEX_SHADER)
