@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/road"
-    tools:context=".MainActivity">
+    android:background="@drawable/road">
 
     <LinearLayout
         android:id="@+id/opengl_container"
@@ -13,14 +10,130 @@
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-
         android:orientation="vertical" />
 
-    <Button
-        android:id="@+id/switch_depth_buffer"
+    <LinearLayout
+        android:id="@+id/setting_container"
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:background="#4f000000"
+        android:orientation="vertical"
+        android:padding="5dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="HighLight Animation"
+                android:textColor="@android:color/white" />
+
+            <Switch
+                android:id="@+id/sw_highlight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="3dp"
+            android:background="@android:color/white" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Arrow Num"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/btn_high_light_arrow_decrease"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:text="-" />
+
+            <TextView
+                android:id="@+id/tv_high_light_arrow_num"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:gravity="center"
+                android:text="3"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/btn_high_light_arrow_increase"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:text="+" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="3dp"
+            android:background="@android:color/white" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Interval (ms)"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/btn_animation_interval_decrease"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:text="-" />
+
+            <TextView
+                android:id="@+id/tv_animation_interval"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:gravity="center"
+                android:text="10"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/btn_animation_interval_increase"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:text="+" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/btn_show_log"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:tag="off"
-        android:text="off" />
+        android:src="@drawable/baseline_visibility_off_black_36"
+        android:tag="invisible" />
 
 </RelativeLayout>

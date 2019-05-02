@@ -24,13 +24,13 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private Triangle mTriangle;
     private SimpleArrow simpleArrow;
 
-
-    // vPMatrix is an abbreviation for "Model View Pprojection Matrix"
     private float[] vPMatrix = new float[16];
     private float[] projectionMatrix = new float[16];
     private float[] viewMatrix = new float[16];
     private float[] mvpMatrix = new float[16];
     private float[] modelMatrix = new float[16];
+
+    public int highLightArrowNum = 3;
 
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
@@ -44,8 +44,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
         // Position the eye in front of the origin.
         final float eyeX = 0.0f;
-        final float eyeY = -3.0f;
-        final float eyeZ = 7.0f;
+        final float eyeY = -0.25f;
+        final float eyeZ = 5.0f;
 
         // We are looking toward the distance
         final float lookX = 0.0f;
@@ -55,7 +55,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // Set our up vector. This is where our head would be pointing were we holding the camera.
         final float upX = 0.0f;
         final float upY = 1.0f;
-        final float upZ = 1.0f;
+        final float upZ = 0.0f;
 
         // Set the view matrix. This matrix can be said to represent the camera position.
         // NOTE: In OpenGL 1, a ModelView matrix is used, which is a combination of a model and
@@ -65,7 +65,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                 lookX, lookY, lookZ,
                 upX, upY, upZ);
 
-        Matrix.rotateM(viewMatrix, 0, 20, 1.0f, 0.0f, 0.0f);
+        //Matrix.rotateM(viewMatrix, 0, -8.5f, 1.0f, 0.0f, 0.0f);
 
         // Set the camera position (View matrix)
         //Matrix.setLookAtM(viewMatrix, 0, 0, 0, -3.7f, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
@@ -90,7 +90,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         float angle = 0.090f * ((int) time);
 
         Matrix.setIdentityM(modelMatrix, 0);
-        Matrix.translateM(modelMatrix, 0, 0.0f, -1.5f, 0.0f);
+        Matrix.translateM(modelMatrix, 0, 0.0f, -1.0f, 2.0f);
         //Matrix.rotateM(modelMatrix, 0, mAngle, 1.0f, 0.0f, 0.0f);
         Matrix.rotateM(modelMatrix, 0, mAngle, 0.0f, 1.0f, 0.0f);
         Matrix.rotateM(modelMatrix, 0, -90.0f, 1.0f, 0.0f, 0.0f);
@@ -98,22 +98,32 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);
         mTriangle.draw(mvpMatrix);
 
-        for (int i = 1; i < 30; i++) {
-            Matrix.setIdentityM(modelMatrix, 0);
-            Matrix.translateM(modelMatrix, 0, 0.0f, -2.0f, 0.0f);
-            Matrix.rotateM(modelMatrix, 0, -90.0f, 1.0f, 0.0f, 0.0f);
-            Matrix.rotateM(modelMatrix, 0, mAngle, 0.0f, 0.0f, 1.0f);
-            Matrix.translateM(modelMatrix, 0, 0.0f, (i * 25) / 10.0f + 0.0f, 0.0f);
-            //Matrix.rotateM(modelMatrix, 0, mAngle, 1.0f, 0.0f, 0.0f);
+        Matrix.setIdentityM(modelMatrix, 0);
+        Matrix.translateM(modelMatrix, 0, 0.0f, -1.5f, 2.5f);
+        Matrix.rotateM(modelMatrix, 0, -90.0f, 1.0f, 0.0f, 0.0f);
+        for (int i = 0; i < 55; i++) {
+            //Matrix.rotateM(modelMatrix, 0, mAngle, 0.0f, 0.0f, 1.0f);
+            //Matrix.rotateM(modelMatrix, 0, i, 0.0f, 0.0f, 1.0f);
+            Matrix.translateM(modelMatrix, 0, 0.0f, 0.3f, 0.0f);
+            if (i > 15) {
+                Matrix.rotateM(modelMatrix, 0, mAngle, 1.0f, 0.0f, 0.0f);
+            }
+            //Matrix.rotateM(modelMatrix, 0, 1, 0.0f, 1.0f, 0.0f);
 
             Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelMatrix, 0);
             Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);
-            if (i % 2 == 0)
-                simpleArrow.draw(mvpMatrix, 1);
-            else
-                simpleArrow.draw(mvpMatrix, 2);
+            if (highLightIndex >= i && highLightIndex <= i + highLightArrowNum) {
+                simpleArrow.draw(mvpMatrix, 0);
+            } else {
+                if (i % 2 == 0)
+                    simpleArrow.draw(mvpMatrix, 1);
+                else
+                    simpleArrow.draw(mvpMatrix, 2);
+            }
         }
     }
+
+    public int highLightIndex = 0;
 
     @Override
     public void onSurfaceChanged(GL10 unused, int width, int height) {
@@ -121,7 +131,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
         float ratio = (float) width / height;
 
-        Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1, 1, 4, 200);
+        Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1, 1, 2, 100);
     }
 
     public static int loadShader(int type, String shaderCode) {
@@ -141,6 +151,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
     public void setAngle(float angle) {
         Log.d(TAG, "setAngle: " + angle);
-        mAngle = angle;
+        mAngle = angle % 360;
+
     }
 }

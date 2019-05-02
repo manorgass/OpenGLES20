@@ -34,8 +34,8 @@ public class SimpleArrow {
     private final int program;
 
     private int mvpMatrixHandle;
-    private static final float xScale = 3.0f;
-    private static final float yScale = 8.0f;
+    private static final float xScale = 1.2f;
+    private static final float yScale = 1.0f;
     private static final int COORDS_PER_VERTEX = 3;
     private static float arrowCoords[] = {
             // 좌측 상단 삼각형
@@ -58,8 +58,9 @@ public class SimpleArrow {
             0.5f * xScale, 0.2f * yScale, 0
     };
 
+    ///private float colorWhite[] = {1.0f, 1.0f, 1.0f, 0.99f};
     private float color[] = {0.4117647f, 0.9411764f, 0.6823529f, 0.5f};
-    private float color1[] = {0.4117647f, 0.9411764f, 0.6823529f, 1.0f};
+    private float color1[] = {0.4117647f, 0.9411764f, 0.6823529f, 9.7f};
     private float highLight[] = {0.0941176f, 1.0f, 1.0f, 1.0f};
 
     public SimpleArrow() {
@@ -94,7 +95,7 @@ public class SimpleArrow {
         colorHandle = GLES20.glGetUniformLocation(program, "vColor");
         switch (colorSelector) {
             case 0:
-                GLES20.glUniform4fv(colorHandle, 1, color, 0);
+                GLES20.glUniform4fv(colorHandle, 1, highLight, 0);
                 break;
             case 1:
                 GLES20.glUniform4fv(colorHandle, 1, color, 0);
