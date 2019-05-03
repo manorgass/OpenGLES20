@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/road">
@@ -12,6 +14,7 @@
         android:layout_centerVertical="true"
         android:orientation="vertical" />
 
+
     <LinearLayout
         android:id="@+id/setting_container"
         android:layout_width="300dp"
@@ -21,111 +24,188 @@
         android:orientation="vertical"
         android:padding="5dp">
 
-        <LinearLayout
+
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content">
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="HighLight Animation"
-                android:textColor="@android:color/white" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-            <Switch
-                android:id="@+id/sw_highlight"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                <android.support.v7.widget.CardView style="@style/SettingCardView">
 
-        </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_margin="3dp"
-            android:background="@android:color/white" />
+                        <TextView
+                            style="@style/CardTitleTextView"
+                            android:text="ANIMATION" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="Arrow Num"
-                android:textColor="@android:color/white" />
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="Play"
+                                android:textColor="@color/settingText" />
 
-            <Button
-                android:id="@+id/btn_high_light_arrow_decrease"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:text="-" />
+                            <Switch
+                                android:id="@+id/sw_highlight"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
 
-            <TextView
-                android:id="@+id/tv_high_light_arrow_num"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="5dp"
-                android:gravity="center"
-                android:text="3"
-                android:textColor="@android:color/white" />
+                        </LinearLayout>
 
-            <Button
-                android:id="@+id/btn_high_light_arrow_increase"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:text="+" />
+                        <View style="@style/settingDivider" />
 
-        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_margin="3dp"
-            android:background="@android:color/white" />
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="Arrow Num"
+                                android:textColor="@color/settingText" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+                            <Button
+                                android:id="@+id/btn_high_light_arrow_decrease"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:text="-" />
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="Interval (ms)"
-                android:textColor="@android:color/white" />
+                            <TextView
+                                android:id="@+id/tv_high_light_arrow_num"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="5dp"
+                                android:gravity="center"
+                                android:text="3"
+                                android:textColor="@color/settingText" />
 
-            <Button
-                android:id="@+id/btn_animation_interval_decrease"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:text="-" />
+                            <Button
+                                android:id="@+id/btn_high_light_arrow_increase"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:text="+" />
 
-            <TextView
-                android:id="@+id/tv_animation_interval"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="5dp"
-                android:gravity="center"
-                android:text="10"
-                android:textColor="@android:color/white" />
+                        </LinearLayout>
 
-            <Button
-                android:id="@+id/btn_animation_interval_increase"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:text="+" />
+                        <View style="@style/settingDivider" />
 
-        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="Interval (ms)"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_animation_interval_decrease"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:text="-" />
+
+                            <TextView
+                                android:id="@+id/tv_animation_interval"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="5dp"
+                                android:gravity="center"
+                                android:text="10"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_animation_interval_increase"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:text="+" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </android.support.v7.widget.CardView>
+
+                <android.support.v7.widget.CardView
+                    style="@style/SettingCardView"
+                    android:layout_marginTop="@dimen/cardViewMarginTop">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/CardTitleTextView"
+                            android:text="ROTATION AXIS" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="X"
+                                android:textColor="@color/settingText" />
+
+                            <CheckBox
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="30dp"
+                                android:text="Y"
+                                android:textColor="@color/settingText" />
+
+                            <CheckBox
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="30dp"
+                                android:text="Z"
+                                android:textColor="@color/settingText" />
+
+                            <CheckBox
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
+
+
+            </LinearLayout>
+
+        </ScrollView>
 
     </LinearLayout>
 

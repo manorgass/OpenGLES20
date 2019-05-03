@@ -35,27 +35,27 @@ public class SimpleArrow {
 
     private int mvpMatrixHandle;
     private static final float xScale = 1.2f;
-    private static final float yScale = 1.0f;
+    private static final float zScale = 1.0f;
     private static final int COORDS_PER_VERTEX = 3;
     private static float arrowCoords[] = {
             // 좌측 상단 삼각형
-            0, 0.5f * yScale, 0,
-            -0.5f * xScale, 0.2f * yScale, 0,
-            0, 0.3f * yScale, 0,
+            0,              0, -0.5f * zScale,
+            -0.5f * xScale, 0, -0.2f * zScale,
+            0,              0, -0.3f * zScale,
 
             // 좌측 하단 삼각형
-            0, 0.3f * yScale, 0,
-            -0.5f * xScale, 0.2f * yScale, 0,
+            0, 0, -0.3f * zScale,
+            -0.5f * xScale, 0, -0.2f * zScale,
             -0.5f * xScale, 0, 0,
 
             // 우측 상단 삼각형
-            0, 0.5f * yScale, 0,
-            0, 0.3f * yScale, 0,
-            0.5f * xScale, 0.2f * yScale, 0,
+            0, 0, -0.5f * zScale,
+            0, 0, -0.3f * zScale,
+            0.5f * xScale, 0, -0.2f * zScale,
             // 우착 하단 삼각형
-            0, 0.3f * yScale, 0,
+            0,             0, -0.3f * zScale,
             0.5f * xScale, 0, 0,
-            0.5f * xScale, 0.2f * yScale, 0
+            0.5f * xScale, 0, -0.2f * zScale
     };
 
     ///private float colorWhite[] = {1.0f, 1.0f, 1.0f, 0.99f};

@@ -31,6 +31,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private float[] modelMatrix = new float[16];
 
     public int highLightArrowNum = 3;
+    public int highLightIndex = -1;
 
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
@@ -100,13 +101,13 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
         Matrix.setIdentityM(modelMatrix, 0);
         Matrix.translateM(modelMatrix, 0, 0.0f, -1.5f, 2.5f);
-        Matrix.rotateM(modelMatrix, 0, -90.0f, 1.0f, 0.0f, 0.0f);
-        for (int i = 0; i < 55; i++) {
+        //Matrix.rotateM(modelMatrix, 0, -90.0f, 1.0f, 0.0f, 0.0f);
+        for (int i = 0; i < 4; i++) {
             //Matrix.rotateM(modelMatrix, 0, mAngle, 0.0f, 0.0f, 1.0f);
             //Matrix.rotateM(modelMatrix, 0, i, 0.0f, 0.0f, 1.0f);
-            Matrix.translateM(modelMatrix, 0, 0.0f, 0.3f, 0.0f);
+            Matrix.translateM(modelMatrix, 0, 0.0f, 0.0f, -0.3f);
             if (i > 15) {
-                Matrix.rotateM(modelMatrix, 0, mAngle, 1.0f, 0.0f, 0.0f);
+                Matrix.rotateM(modelMatrix, 0, mAngle, 0.0f, 1.0f, 0.0f);
             }
             //Matrix.rotateM(modelMatrix, 0, 1, 0.0f, 1.0f, 0.0f);
 
@@ -123,7 +124,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         }
     }
 
-    public int highLightIndex = 0;
 
     @Override
     public void onSurfaceChanged(GL10 unused, int width, int height) {

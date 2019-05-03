@@ -40,7 +40,7 @@ public class OpenGLES20Activity extends Activity {
             int i = 0;
             while (true) {
                 i++;
-                renderer.highLightIndex = i % 50;
+                renderer.highLightIndex = i % (4 + renderer.highLightArrowNum);
                 glView.requestRender();
                 try {
                     Thread.sleep(animSpeed);
@@ -70,6 +70,7 @@ public class OpenGLES20Activity extends Activity {
                 if (v.getTag().equals("visible")) {
                     v.setTag("invisible");
                     findViewById(R.id.setting_container).setVisibility(View.VISIBLE);
+                    findViewById(R.id.setting_container).setZ(1);
                     ((ImageButton) v).setImageResource(R.drawable.baseline_visibility_off_black_36);
                 } else {
                     v.setTag("visible");
@@ -108,6 +109,15 @@ public class OpenGLES20Activity extends Activity {
                 tvHighLightArrowNum.setText("" + renderer.highLightArrowNum);
             }
         });
+        findViewById(R.id.btn_high_light_arrow_increase).setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                renderer.highLightArrowNum++;
+                tvHighLightArrowNum.setText("" + renderer.highLightArrowNum);
+                return true;
+            }
+        });
+
         findViewById(R.id.btn_high_light_arrow_decrease).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -121,22 +131,28 @@ public class OpenGLES20Activity extends Activity {
         // 에니메이션 interval 변경
         final TextView tvAnimInterval = findViewById(R.id.tv_animation_interval);
         tvAnimInterval.setText("" + animSpeed);
-        findViewById(R.id.btn_animation_interval_increase).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                animSpeed += 3;
-                tvAnimInterval.setText("" + animSpeed);
-            }
-        });
-        findViewById(R.id.btn_animation_interval_decrease).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (animSpeed > 3) {
-                    animSpeed -= 3;
-                    tvAnimInterval.setText("" + animSpeed);
-                }
-            }
-        });
+
+        findViewById(R.id.btn_animation_interval_increase).
+
+                setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        animSpeed += 3;
+                        tvAnimInterval.setText("" + animSpeed);
+                    }
+                });
+
+        findViewById(R.id.btn_animation_interval_decrease).
+
+                setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (animSpeed > 3) {
+                            animSpeed -= 3;
+                            tvAnimInterval.setText("" + animSpeed);
+                        }
+                    }
+                });
     }
 
     public class MyGLSurfaceView extends GLSurfaceView {
@@ -149,7 +165,7 @@ public class OpenGLES20Activity extends Activity {
 
             renderer = new MyGLRenderer();
 
-            setZOrderOnTop(true);
+            setZOrderMediaOverlay(true);
 
             // Set background transparent
             setEGLConfigChooser(8, 8, 8, 8, 16, 0);
