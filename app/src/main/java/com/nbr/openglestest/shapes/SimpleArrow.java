@@ -15,6 +15,8 @@ import java.nio.FloatBuffer;
  * @email manorgass@gmail.com
  */
 public class SimpleArrow {
+    public static final int DRAW_FRAME_LEFT = 1;
+
     private final String vertexShaderCode =
             "uniform mat4 uMVPMatrix;                   " +
                     "attribute vec4 vPosition;                  " +
@@ -59,9 +61,9 @@ public class SimpleArrow {
     };
 
     ///private float colorWhite[] = {1.0f, 1.0f, 1.0f, 0.99f};
-    private float color[] = {0.4117647f, 0.9411764f, 0.6823529f, 0.5f};
-    private float color1[] = {0.4117647f, 0.9411764f, 0.6823529f, 9.7f};
-    private float highLight[] = {0.0941176f, 1.0f, 1.0f, 1.0f};
+    private float color[] = {0.87843137f, 0.949019f, 0.945098039f, 0.4f};
+    private float color1[] = {0.4117647f, 0.9411764f, 0.6823529f, 0.4f};
+    private float highLight[] = {0.0941176f, 1.0f, 1.0f, 0.1f};
 
     public SimpleArrow() {
         ByteBuffer buffer = ByteBuffer.allocateDirect(arrowCoords.length * Float.BYTES);

@@ -77,13 +77,13 @@
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
                                 android:gravity="center"
-                                android:text="Arrow Num"
+                                android:text="Highlight Num"
                                 android:textColor="@color/settingText" />
 
                             <Button
                                 android:id="@+id/btn_high_light_arrow_decrease"
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
                                 android:text="-" />
 
                             <TextView
@@ -93,13 +93,52 @@
                                 android:layout_marginStart="5dp"
                                 android:layout_marginEnd="5dp"
                                 android:gravity="center"
-                                android:text="3"
+                                android:text="03"
                                 android:textColor="@color/settingText" />
 
                             <Button
                                 android:id="@+id/btn_high_light_arrow_increase"
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="+" />
+
+                        </LinearLayout>
+
+                        <View style="@style/settingDivider" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="Arrow Num"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_arrow_decrease"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="-" />
+
+                            <TextView
+                                android:id="@+id/tv_arrow_num"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="5dp"
+                                android:gravity="center"
+                                android:text="03"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_arrow_increase"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
                                 android:text="+" />
 
                         </LinearLayout>
@@ -121,8 +160,8 @@
 
                             <Button
                                 android:id="@+id/btn_animation_interval_decrease"
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
                                 android:text="-" />
 
                             <TextView
@@ -137,8 +176,8 @@
 
                             <Button
                                 android:id="@+id/btn_animation_interval_increase"
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
                                 android:text="+" />
 
                         </LinearLayout>
@@ -158,7 +197,7 @@
 
                         <TextView
                             style="@style/CardTitleTextView"
-                            android:text="ROTATION AXIS" />
+                            android:text="ROTATION" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -172,6 +211,7 @@
                                 android:textColor="@color/settingText" />
 
                             <CheckBox
+                                android:id="@+id/cb_axis_x"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content" />
 
@@ -183,8 +223,10 @@
                                 android:textColor="@color/settingText" />
 
                             <CheckBox
+                                android:id="@+id/cb_axis_y"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="wrap_content"
+                                android:checked="true" />
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -194,14 +236,185 @@
                                 android:textColor="@color/settingText" />
 
                             <CheckBox
+                                android:id="@+id/cb_axis_z"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content" />
+
+                        </LinearLayout>
+
+                        <View style="@style/settingDivider" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="Start Index"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_rotation_start_index_decrease"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="-" />
+
+                            <TextView
+                                android:id="@+id/tv_rotation_start_index"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="5dp"
+                                android:gravity="center"
+                                android:text="10"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_rotation_start_index_increase"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="+" />
+
+                        </LinearLayout>
+
+                        <View style="@style/settingDivider" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="MAX Angle"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_max_angle_decrease"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="-" />
+
+                            <TextView
+                                android:id="@+id/tv_max_angle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="5dp"
+                                android:gravity="center"
+                                android:text="10"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_max_angle_increase"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="+" />
 
                         </LinearLayout>
 
                     </LinearLayout>
                 </android.support.v7.widget.CardView>
 
+                <android.support.v7.widget.CardView
+                    style="@style/SettingCardView"
+                    android:layout_marginTop="@dimen/cardViewMarginTop">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/CardTitleTextView"
+                            android:text="EYE POSITION" />
+
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="Y - AXIS"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_eye_y_axis_decrease"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="-" />
+
+                            <TextView
+                                android:id="@+id/tv_eye_y_axis_position"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="5dp"
+                                android:gravity="center"
+                                android:text="10"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_eye_y_axis_increase"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="+" />
+
+                        </LinearLayout>
+
+                        <View style="@style/settingDivider" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="Z - AXIS"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_eye_z_axis_decrease"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="-" />
+
+                            <TextView
+                                android:id="@+id/tv_eye_z_axis_position"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="5dp"
+                                android:gravity="center"
+                                android:text="10"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_eye_z_axis_increase"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="+" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
 
             </LinearLayout>
 
@@ -215,5 +428,27 @@
         android:layout_height="wrap_content"
         android:src="@drawable/baseline_visibility_off_black_36"
         android:tag="invisible" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_angle_total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#ff0000"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tv_angle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#ff0000"
+            android:textSize="16sp" />
+
+    </LinearLayout>
 
 </RelativeLayout>

@@ -8,9 +8,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
@@ -32,7 +31,11 @@ public class OpenGLES20Activity extends Activity {
 
     private boolean eot = false;
 
-    private long animSpeed = 30;
+    private int animSpeed = 30;
+
+    private int checkedNum = 1;
+
+    private TextView tvAngle, tvAngleTotal;
 
     private Runnable highLightRunnable = new Runnable() {
         @Override
@@ -40,7 +43,7 @@ public class OpenGLES20Activity extends Activity {
             int i = 0;
             while (true) {
                 i++;
-                renderer.highLightIndex = i % (4 + renderer.highLightArrowNum);
+                renderer.highLightIndex = i % (renderer.arrowNum + renderer.highLightArrowNum);
                 glView.requestRender();
                 try {
                     Thread.sleep(animSpeed);
@@ -101,20 +104,12 @@ public class OpenGLES20Activity extends Activity {
 
         // 하이라이트 갯수 변경
         final TextView tvHighLightArrowNum = findViewById(R.id.tv_high_light_arrow_num);
-        tvHighLightArrowNum.setText("" + renderer.highLightArrowNum);
+        setText(tvHighLightArrowNum, renderer.highLightArrowNum);
         findViewById(R.id.btn_high_light_arrow_increase).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 renderer.highLightArrowNum++;
-                tvHighLightArrowNum.setText("" + renderer.highLightArrowNum);
-            }
-        });
-        findViewById(R.id.btn_high_light_arrow_increase).setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                renderer.highLightArrowNum++;
-                tvHighLightArrowNum.setText("" + renderer.highLightArrowNum);
-                return true;
+                setText(tvHighLightArrowNum, renderer.highLightArrowNum);
             }
         });
 
@@ -123,22 +118,44 @@ public class OpenGLES20Activity extends Activity {
             public void onClick(View v) {
                 if (renderer.highLightArrowNum != 1) {
                     renderer.highLightArrowNum--;
-                    tvHighLightArrowNum.setText("" + renderer.highLightArrowNum);
+                    setText(tvHighLightArrowNum, renderer.highLightArrowNum);
+                }
+            }
+        });
+
+        // 화살표 갯수 변경
+        final TextView tvArrowNum = findViewById(R.id.tv_arrow_num);
+        final int stride = 3;
+        setText(tvArrowNum, renderer.arrowNum);
+        findViewById(R.id.btn_arrow_increase).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                renderer.arrowNum += stride;
+                glView.requestRender();
+                setText(tvArrowNum, renderer.arrowNum);
+            }
+        });
+
+        findViewById(R.id.btn_arrow_decrease).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (renderer.arrowNum > stride) {
+                    renderer.arrowNum -= stride;
+                    glView.requestRender();
+                    setText(tvArrowNum, renderer.arrowNum);
                 }
             }
         });
 
         // 에니메이션 interval 변경
         final TextView tvAnimInterval = findViewById(R.id.tv_animation_interval);
-        tvAnimInterval.setText("" + animSpeed);
-
+        setText(tvAnimInterval, animSpeed);
         findViewById(R.id.btn_animation_interval_increase).
-
                 setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        animSpeed += 3;
-                        tvAnimInterval.setText("" + animSpeed);
+                        animSpeed += stride;
+                        setText(tvAnimInterval, animSpeed);
                     }
                 });
 
@@ -148,11 +165,160 @@ public class OpenGLES20Activity extends Activity {
                     @Override
                     public void onClick(View v) {
                         if (animSpeed > 3) {
-                            animSpeed -= 3;
-                            tvAnimInterval.setText("" + animSpeed);
+                            animSpeed -= stride;
+                            setText(tvAnimInterval, animSpeed);
                         }
                     }
                 });
+
+        // 회전 축 설정
+        final CheckBox cbRotationAxis_x = findViewById(R.id.cb_axis_x);
+        cbRotationAxis_x.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    checkedNum++;
+                    renderer.arrowRotationAxis_x = 1.0f;
+                } else {
+                    if (checkedNum == 1) {
+                        cbRotationAxis_x.setChecked(true);
+                    } else {
+                        checkedNum--;
+                        renderer.arrowRotationAxis_x = 0.0f;
+                    }
+                }
+            }
+        });
+
+        final CheckBox cbRotationAxis_y = findViewById(R.id.cb_axis_y);
+        cbRotationAxis_y.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    checkedNum++;
+                    renderer.arrowRotationAxis_y = 1.0f;
+                } else {
+                    if (checkedNum == 1) {
+                        cbRotationAxis_y.setChecked(true);
+                    } else {
+                        checkedNum--;
+                        renderer.arrowRotationAxis_y = 0.0f;
+                    }
+                }
+            }
+        });
+
+        final CheckBox cbRotationAxis_z = findViewById(R.id.cb_axis_z);
+        cbRotationAxis_z.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    checkedNum++;
+                    renderer.arrowRotationAxis_z = 1.0f;
+                } else {
+                    if (checkedNum == 1) {
+                        cbRotationAxis_z.setChecked(true);
+                    } else {
+                        checkedNum--;
+                        renderer.arrowRotationAxis_z = 0.0f;
+                    }
+                }
+            }
+        });
+
+        // 각도 표시
+        tvAngle = findViewById(R.id.tv_angle);
+        tvAngleTotal = findViewById(R.id.tv_angle_total);
+
+        // 회전 시작 지점 변경
+        final TextView tvRotationStartIndex = findViewById(R.id.tv_rotation_start_index);
+        setText(tvRotationStartIndex, renderer.rotationStartIndex);
+        findViewById(R.id.btn_rotation_start_index_increase).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                renderer.rotationStartIndex += stride;
+                setText(tvRotationStartIndex, renderer.rotationStartIndex);
+            }
+        });
+
+        findViewById(R.id.btn_rotation_start_index_decrease).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (renderer.rotationStartIndex > stride) {
+                    renderer.rotationStartIndex -= stride;
+                    setText(tvRotationStartIndex, renderer.rotationStartIndex);
+                }
+            }
+        });
+
+        // 최대 회전각 설정
+        final TextView tvMaxAngle = findViewById(R.id.tv_max_angle);
+        setText(tvMaxAngle, renderer.maxAngle);
+        findViewById(R.id.btn_max_angle_increase).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                renderer.maxAngle += 10;
+                setText(tvMaxAngle, renderer.maxAngle);
+            }
+        });
+
+        findViewById(R.id.btn_max_angle_decrease).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (renderer.maxAngle > 10) {
+                    renderer.maxAngle -= 10;
+                    setText(tvMaxAngle, renderer.maxAngle);
+                }
+            }
+        });
+
+        // View Matrix y축 포지션 설정
+        final TextView tvEyeYAxisPosition = findViewById(R.id.tv_eye_y_axis_position);
+        setText(tvEyeYAxisPosition, renderer.eyeY);
+        findViewById(R.id.btn_eye_y_axis_increase).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                renderer.eyeY += 0.05f;
+                renderer.updateCameraPosition();
+                glView.requestRender();
+                setText(tvEyeYAxisPosition, renderer.eyeY);
+
+            }
+        });
+
+        findViewById(R.id.btn_eye_y_axis_decrease).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                renderer.eyeY -= 0.05f;
+                renderer.updateCameraPosition();
+                glView.requestRender();
+                setText(tvEyeYAxisPosition, renderer.eyeY);
+            }
+        });
+
+        // View Matrix z축 포지션 설정
+        final TextView tvEyeZAxisPosition = findViewById(R.id.tv_eye_z_axis_position);
+        setText(tvEyeYAxisPosition, renderer.eyeZ);
+        findViewById(R.id.btn_eye_z_axis_increase).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                renderer.eyeZ += 0.2f;
+                renderer.updateCameraPosition();
+                glView.requestRender();
+                setText(tvEyeZAxisPosition, renderer.eyeZ);
+
+            }
+        });
+
+        findViewById(R.id.btn_eye_z_axis_decrease).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                renderer.eyeZ -= 0.2f;
+                renderer.updateCameraPosition();
+                glView.requestRender();
+                setText(tvEyeZAxisPosition, renderer.eyeZ);
+            }
+        });
     }
 
     public class MyGLSurfaceView extends GLSurfaceView {
@@ -165,7 +331,7 @@ public class OpenGLES20Activity extends Activity {
 
             renderer = new MyGLRenderer();
 
-            setZOrderMediaOverlay(true);
+            setZOrderOnTop(true);
 
             // Set background transparent
             setEGLConfigChooser(8, 8, 8, 8, 16, 0);
@@ -176,7 +342,7 @@ public class OpenGLES20Activity extends Activity {
             setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         }
 
-        private final float TOUCH_SCALE_FACTOR = 180.0f / 320 / 5;
+        private final float TOUCH_SCALE_FACTOR = 180.0f / 320 / 10;
         private float previousX;
         private float previousY;
 
@@ -197,7 +363,10 @@ public class OpenGLES20Activity extends Activity {
                     // revers direction of rotation to  left of the mid-line
                     if (x < getWidth() / 2) dy *= -1;
 
-                    renderer.setAngle(renderer.getAngle() + ((dx + dy) * TOUCH_SCALE_FACTOR));
+                    float angle = renderer.getAngle() + ((dx + dy) * TOUCH_SCALE_FACTOR);
+                    tvAngle.setText("Angle : " + Float.toString(angle));
+                    tvAngleTotal.setText("Angle Total : " + Float.toString(angle * (renderer.arrowNum - renderer.rotationStartIndex)));
+                    renderer.setAngle(angle);
                     requestRender();
 
                     break;
@@ -209,5 +378,13 @@ public class OpenGLES20Activity extends Activity {
         }
     }
 
+    private void setText(View v, int num) {
+        String text = String.format("%02d", num);
+        ((TextView) v).setText(text);
+    }
 
+    private void setText(View v, float num) {
+        String text = String.format("%.2f", num);
+        ((TextView) v).setText(text);
+    }
 }
