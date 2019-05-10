@@ -15,8 +15,6 @@ import java.nio.FloatBuffer;
  * @email manorgass@gmail.com
  */
 public class SimpleArrow {
-    public static final int DRAW_FRAME_LEFT = 1;
-
     private final String vertexShaderCode =
             "uniform mat4 uMVPMatrix;                   " +
                     "attribute vec4 vPosition;                  " +
@@ -36,7 +34,7 @@ public class SimpleArrow {
     private final int program;
 
     private int mvpMatrixHandle;
-    private static final float xScale = 1.2f;
+    private static final float xScale = 2.0f;
     private static final float zScale = 1.0f;
     private static final int COORDS_PER_VERTEX = 3;
     private static float arrowCoords[] = {

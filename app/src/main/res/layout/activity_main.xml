@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/road">
+    android:background="@drawable/rigthturn2">
 
     <LinearLayout
         android:id="@+id/opengl_container"
@@ -17,7 +17,7 @@
 
     <LinearLayout
         android:id="@+id/setting_container"
-        android:layout_width="300dp"
+        android:layout_width="400dp"
         android:layout_height="match_parent"
         android:layout_alignParentEnd="true"
         android:background="#4f000000"
@@ -407,6 +407,347 @@
 
                             <Button
                                 android:id="@+id/btn_eye_z_axis_increase"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="+" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
+
+
+                <android.support.v7.widget.CardView
+                    style="@style/SettingCardView"
+                    android:layout_marginTop="@dimen/cardViewMarginTop">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/CardTitleTextView"
+                            android:text="DRAW MODE" />
+
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <RadioGroup
+                                android:id="@+id/rg_draw_mode"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="30dp"
+                                android:orientation="vertical">
+
+                                <RadioButton
+                                    android:id="@+id/rb_draw_normal"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="10dp"
+                                    android:checked="true"
+                                    android:text="Normal" />
+
+                                <RadioButton
+                                    android:id="@+id/rb_draw_z_spin"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Z-Axis Spin" />
+
+                                <RadioButton
+                                    android:id="@+id/rb_draw_line_dot"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Line Dot" />
+
+                                <RadioButton
+                                    android:id="@+id/rb_draw_line_cross"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Line Cross" />
+
+                                <RadioButton
+                                    android:id="@+id/rb_draw_line_triangle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Line Triangle" />
+
+                            </RadioGroup>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
+
+                <android.support.v7.widget.CardView
+                    style="@style/SettingCardView"
+                    android:layout_marginTop="@dimen/cardViewMarginTop">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/CardTitleTextView"
+                            android:text="Z-AXIS SPIN" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="Max Degree"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_z_axis_max_degree_decrease"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="-" />
+
+                            <TextView
+                                android:id="@+id/tv_z_axis_spin_max_degree"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="5dp"
+                                android:gravity="center"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_z_axis_max_degree_increase"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="+" />
+
+                        </LinearLayout>
+
+                        <View style="@style/settingDivider" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="Stride"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_z_axis_stride_decrease"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="-" />
+
+                            <TextView
+                                android:id="@+id/tv_z_axis_spin_stride"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="5dp"
+                                android:gravity="center"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_z_axis_stride_increase"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="+" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
+
+                <android.support.v7.widget.CardView
+                    style="@style/SettingCardView"
+                    android:layout_marginTop="@dimen/cardViewMarginTop">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/CardTitleTextView"
+                            android:text="LINE SETTING" />
+
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="WIDTH"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_line_width_decrease"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="-" />
+
+                            <TextView
+                                android:id="@+id/tv_line_width"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="5dp"
+                                android:gravity="center"
+                                android:text="10"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_line_width_increase"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="+" />
+
+                        </LinearLayout>
+
+                        <View style="@style/settingDivider" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="STRIDE"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_line_stride_decrease"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="-" />
+
+                            <TextView
+                                android:id="@+id/tv_line_stride"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="5dp"
+                                android:gravity="center"
+                                android:text="10"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_line_stride_increase"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="+" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
+
+                <android.support.v7.widget.CardView
+                    style="@style/SettingCardView"
+                    android:layout_marginTop="@dimen/cardViewMarginTop">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/CardTitleTextView"
+                            android:text="HIGHLIGHT ARROW Z-SPIN" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="max z-axis degree"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_max_z_axis_degree_decrease"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="-" />
+
+                            <TextView
+                                android:id="@+id/tv_max_z_axis_degree"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="5dp"
+                                android:gravity="center"
+                                android:text="0"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_max_z_axis_degree_increase"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="+" />
+
+                        </LinearLayout>
+
+                        <View style="@style/settingDivider" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="rotation stride"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_z_spin_stride_decrease"
+                                android:layout_width="@dimen/buttonSize"
+                                android:layout_height="@dimen/buttonSize"
+                                android:text="-" />
+
+                            <TextView
+                                android:id="@+id/tv_z_spin_stride"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="5dp"
+                                android:gravity="center"
+                                android:text="10"
+                                android:textColor="@color/settingText" />
+
+                            <Button
+                                android:id="@+id/btn_z_spin_stride_increase"
                                 android:layout_width="@dimen/buttonSize"
                                 android:layout_height="@dimen/buttonSize"
                                 android:text="+" />

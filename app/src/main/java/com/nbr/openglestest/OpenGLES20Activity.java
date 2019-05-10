@@ -12,8 +12,11 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import com.nbr.openglestest.shapes.LineDot;
 
 /**
  * @author JungWon Kim
@@ -131,8 +134,8 @@ public class OpenGLES20Activity extends Activity {
             @Override
             public void onClick(View v) {
                 renderer.arrowNum += stride;
-                glView.requestRender();
                 setText(tvArrowNum, renderer.arrowNum);
+                glView.requestRender();
             }
         });
 
@@ -141,8 +144,8 @@ public class OpenGLES20Activity extends Activity {
             public void onClick(View v) {
                 if (renderer.arrowNum > stride) {
                     renderer.arrowNum -= stride;
-                    glView.requestRender();
                     setText(tvArrowNum, renderer.arrowNum);
+                    glView.requestRender();
                 }
             }
         });
@@ -187,6 +190,7 @@ public class OpenGLES20Activity extends Activity {
                         renderer.arrowRotationAxis_x = 0.0f;
                     }
                 }
+                glView.requestRender();
             }
         });
 
@@ -205,6 +209,7 @@ public class OpenGLES20Activity extends Activity {
                         renderer.arrowRotationAxis_y = 0.0f;
                     }
                 }
+                glView.requestRender();
             }
         });
 
@@ -223,6 +228,7 @@ public class OpenGLES20Activity extends Activity {
                         renderer.arrowRotationAxis_z = 0.0f;
                     }
                 }
+                glView.requestRender();
             }
         });
 
@@ -238,6 +244,7 @@ public class OpenGLES20Activity extends Activity {
             public void onClick(View v) {
                 renderer.rotationStartIndex += stride;
                 setText(tvRotationStartIndex, renderer.rotationStartIndex);
+                glView.requestRender();
             }
         });
 
@@ -247,6 +254,7 @@ public class OpenGLES20Activity extends Activity {
                 if (renderer.rotationStartIndex > stride) {
                     renderer.rotationStartIndex -= stride;
                     setText(tvRotationStartIndex, renderer.rotationStartIndex);
+                    glView.requestRender();
                 }
             }
         });
@@ -259,6 +267,7 @@ public class OpenGLES20Activity extends Activity {
             public void onClick(View v) {
                 renderer.maxAngle += 10;
                 setText(tvMaxAngle, renderer.maxAngle);
+                glView.requestRender();
             }
         });
 
@@ -268,6 +277,7 @@ public class OpenGLES20Activity extends Activity {
                 if (renderer.maxAngle > 10) {
                     renderer.maxAngle -= 10;
                     setText(tvMaxAngle, renderer.maxAngle);
+                    glView.requestRender();
                 }
             }
         });
@@ -298,7 +308,7 @@ public class OpenGLES20Activity extends Activity {
 
         // View Matrix z축 포지션 설정
         final TextView tvEyeZAxisPosition = findViewById(R.id.tv_eye_z_axis_position);
-        setText(tvEyeYAxisPosition, renderer.eyeZ);
+        setText(tvEyeZAxisPosition, renderer.eyeZ);
         findViewById(R.id.btn_eye_z_axis_increase).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -317,6 +327,168 @@ public class OpenGLES20Activity extends Activity {
                 renderer.updateCameraPosition();
                 glView.requestRender();
                 setText(tvEyeZAxisPosition, renderer.eyeZ);
+            }
+        });
+
+        // drawDots mode 설정
+        final RadioGroup rgDrawMode = findViewById(R.id.rg_draw_mode);
+        rgDrawMode.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId) {
+                    case R.id.rb_draw_normal:
+                        renderer.drawMode = MyGLRenderer.DRAW_NORMAL;
+                        glView.requestRender();
+                        break;
+                    case R.id.rb_draw_z_spin:
+                        renderer.drawMode = MyGLRenderer.DRAW_Z_SPIN;
+                        glView.requestRender();
+                        break;
+                    case R.id.rb_draw_line_dot:
+                        renderer.drawMode = MyGLRenderer.DRAW_LINE_DOT;
+                        glView.requestRender();
+                        break;
+                    case R.id.rb_draw_line_cross:
+                        renderer.drawMode = MyGLRenderer.DRAW_LINE_CROSS;
+                        glView.requestRender();
+                        break;
+                    case R.id.rb_draw_line_triangle:
+                        renderer.drawMode = MyGLRenderer.DRAW_LINE_TRIANGLE;
+                        glView.requestRender();
+                        break;
+                }
+            }
+        });
+
+        // Z축 회전 최대각도 설정
+        final TextView tvZAxisMaxDegree = findViewById(R.id.tv_z_axis_spin_max_degree);
+        tvZAxisMaxDegree.setText("" + renderer.degreeLimit);
+
+        findViewById(R.id.btn_z_axis_max_degree_increase).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                renderer.degreeLimit += 1;
+                setText(tvZAxisMaxDegree, renderer.degreeLimit);
+                glView.requestRender();
+            }
+        });
+
+        findViewById(R.id.btn_z_axis_max_degree_decrease).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                renderer.degreeLimit -= 1;
+                setText(tvZAxisMaxDegree, renderer.degreeLimit);
+                glView.requestRender();
+            }
+        });
+
+        // Z축 회전 폭 설정
+        final TextView tvZAxisSpinStride = findViewById(R.id.tv_z_axis_spin_stride);
+        tvZAxisSpinStride.setText("" + renderer.zAxisRotationStride);
+
+        findViewById(R.id.btn_z_axis_stride_increase).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                renderer.zAxisRotationStride += 0.5;
+                setText(tvZAxisSpinStride, renderer.zAxisRotationStride);
+                glView.requestRender();
+            }
+        });
+
+        findViewById(R.id.btn_z_axis_stride_decrease).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                renderer.zAxisRotationStride -= 0.5;
+                setText(tvZAxisSpinStride, renderer.zAxisRotationStride);
+                glView.requestRender();
+            }
+        });
+
+        // line 두깨 설정
+        final TextView tvLineWidth = findViewById(R.id.tv_line_width);
+        setText(tvLineWidth, LineDot.LINE_WIDTH);
+        findViewById(R.id.btn_line_width_increase).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (10 > LineDot.LINE_WIDTH) {
+                    LineDot.LINE_WIDTH++;
+                    setText(tvLineWidth, LineDot.LINE_WIDTH);
+                    glView.requestRender();
+                }
+            }
+        });
+
+        findViewById(R.id.btn_line_width_decrease).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (1 < LineDot.LINE_WIDTH) {
+                    LineDot.LINE_WIDTH--;
+                    setText(tvLineWidth, LineDot.LINE_WIDTH);
+                    glView.requestRender();
+                }
+            }
+        });
+
+        // line 간격(폭) 설정
+        final TextView tvLineStride = findViewById(R.id.tv_line_stride);
+        setText(tvLineStride, renderer.lineStride);
+        findViewById(R.id.btn_line_stride_increase).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                renderer.lineStride += 0.1f;
+                renderer.setHighlightArrow();
+                setText(tvLineStride, renderer.lineStride);
+                glView.requestRender();
+            }
+        });
+
+        findViewById(R.id.btn_line_stride_decrease).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (0.3f < renderer.lineStride) {
+                    renderer.lineStride -= 0.1f;
+                    renderer.setHighlightArrow();
+                    setText(tvLineStride, renderer.lineStride);
+                    glView.requestRender();
+                }
+            }
+        });
+
+        // 하이라이트 화살표 z 축 회전 최대 각도 설정
+        final TextView tvMaxZAxisDegree = findViewById(R.id.tv_max_z_axis_degree);
+        setText(tvMaxZAxisDegree, renderer.zSpinLimit);
+        findViewById(R.id.btn_max_z_axis_degree_increase).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                renderer.zSpinLimit += 3.0f;
+                setText(tvMaxZAxisDegree, renderer.zSpinLimit);
+            }
+        });
+
+        findViewById(R.id.btn_max_z_axis_degree_decrease).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                renderer.zSpinLimit -= 3.0f;
+                setText(tvMaxZAxisDegree, renderer.zSpinLimit);
+            }
+        });
+
+        // 하이라이트 화살표 z 축 1회 회전 시 각도 변경 폭 설정
+        final TextView tvZAxisStride = findViewById(R.id.tv_z_spin_stride);
+        setText(tvZAxisStride, renderer.zSpintStride);
+        findViewById(R.id.btn_z_spin_stride_increase).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                renderer.zSpintStride += 1.0f;
+                setText(tvZAxisStride, renderer.zSpintStride);
+            }
+        });
+
+        findViewById(R.id.btn_z_spin_stride_decrease).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                renderer.zSpintStride -= 1.0f;
+                setText(tvZAxisStride, renderer.zSpintStride);
             }
         });
     }
