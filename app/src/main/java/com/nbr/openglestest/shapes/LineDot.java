@@ -82,11 +82,11 @@ public class LineDot {
     };
 
     ///private float colorWhite[] = {1.0f, 1.0f, 1.0f, 0.99f};
-    private float color[] = {0.87843137f, 0.949019f, 0.945098039f, 0.4f};
-    private float color1[] = {0.4117647f, 0.9411764f, 0.6823529f, 0.4f};
-    private float highLight[] = {0.0f, 1.0f, 0.0f, 0.7f};
-    private float colorGreen[] = {0.0f, 1.0f, 0.0f, 0.3f};
-    private float colorHighlightArrow[] = {0.0f, 0.7843137254901961f, 0.3254901960784314f, 0.5f};
+    public float color[] = {0.87843137f, 0.949019f, 0.945098039f, 0.4f};
+    public float color1[] = {0.4117647f, 0.9411764f, 0.6823529f, 0.4f};
+    public float colorShadow[] = {0.0f, 1.0f, 0.0f, 0.7f};
+    public float colorLine[] = {0.0f, 1.0f, 0.0f, 0.3f};
+    public float colorHighlightArrow[] = {0.0f, 0.7843137254901961f, 0.3254901960784314f, 0.5f};
 
     public LineDot() {
         ByteBuffer buffer = ByteBuffer.allocateDirect(dotCoords.length * Float.BYTES);
@@ -128,7 +128,7 @@ public class LineDot {
 
         switch (colorSelector) {
             case 0:
-                GLES20.glUniform4fv(colorHandle, 1, highLight, 0);
+                GLES20.glUniform4fv(colorHandle, 1, colorHighlightArrow, 0);
                 break;
             case 1:
                 GLES20.glUniform4fv(colorHandle, 1, color, 0);
@@ -158,7 +158,7 @@ public class LineDot {
 
         switch (colorSelector) {
             case 0:
-                GLES20.glUniform4fv(colorHandle, 1, highLight, 0);
+                GLES20.glUniform4fv(colorHandle, 1, colorHighlightArrow, 0);
                 break;
             case 1:
                 GLES20.glUniform4fv(colorHandle, 1, color, 0);
@@ -189,7 +189,7 @@ public class LineDot {
 
         switch (colorSelector) {
             case 0:
-                GLES20.glUniform4fv(colorHandle, 1, highLight, 0);
+                GLES20.glUniform4fv(colorHandle, 1, colorHighlightArrow, 0);
                 break;
             case 1:
                 GLES20.glUniform4fv(colorHandle, 1, color, 0);
@@ -202,7 +202,7 @@ public class LineDot {
         mvpMatrixHandle = GLES20.glGetUniformLocation(program, "uMVPMatrix");
         GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, mvpMatrix, 0);
 
-        GLES20.glDrawArrays(GLES20.GL_POINTS, 0, vertexCount);
+        GLES20.glDrawArrays(GLES20.GL_POINTS, 0, dotsVertexCount);
 
         GLES20.glDisableVertexAttribArray(positionHandle);
     }
@@ -215,6 +215,16 @@ public class LineDot {
         linesVertexBuffer.position(0);
 
         lineVertexCount = lineCoords.length / 3;
+    }
+
+    public void setDotsVertexBuffer(float[] dotsCoords) {
+        ByteBuffer crossBuffer = ByteBuffer.allocateDirect(dotsCoords.length * Float.BYTES);
+        crossBuffer.order(ByteOrder.nativeOrder());
+        dotsVertexBuffer = crossBuffer.asFloatBuffer();
+        dotsVertexBuffer.put(dotsCoords);
+        dotsVertexBuffer.position(0);
+
+        dotsVertexCount = dotsCoords.length / 3;
     }
 
     public void setCrossVertexBuffer(float[] crossCoords) {
@@ -239,6 +249,7 @@ public class LineDot {
 
     private int triangleVertexCount;
     private int crossVertexCount;
+    private int dotsVertexCount;
     private int lineVertexCount;
     public static int LINE_WIDTH = 5;
 
@@ -250,7 +261,7 @@ public class LineDot {
         GLES20.glVertexAttribPointer(positionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false, vertexStride, linesVertexBuffer);
 
         colorHandle = GLES20.glGetUniformLocation(program, "vColor");
-        GLES20.glUniform4fv(colorHandle, 1, colorGreen, 0);
+        GLES20.glUniform4fv(colorHandle, 1, colorLine, 0);
 
         mvpMatrixHandle = GLES20.glGetUniformLocation(program, "uMVPMatrix");
         GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, mvpMatrix, 0);

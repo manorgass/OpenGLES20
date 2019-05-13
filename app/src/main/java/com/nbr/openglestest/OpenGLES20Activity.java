@@ -2,10 +2,11 @@ package com.nbr.openglestest;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.os.Handler;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.CheckBox;
@@ -16,6 +17,8 @@ import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.jaredrummler.android.colorpicker.ColorPickerDialog;
+import com.jaredrummler.android.colorpicker.ColorPickerDialogListener;
 import com.nbr.openglestest.shapes.LineDot;
 
 /**
@@ -23,10 +26,15 @@ import com.nbr.openglestest.shapes.LineDot;
  * @date 월요일, 4월, 2019
  * @email manorgass@gmail.com
  */
-public class OpenGLES20Activity extends Activity {
+public class OpenGLES20Activity extends AppCompatActivity implements ColorPickerDialogListener {
+    private final int DIALOG_LINE_COLOR = 0;
+    private final int DIALOG_HIGHLIGHT_COLOR = 1;
+    private final int DIALOG_PATTERN_1_COLOR = 2;
+    private final int DIALOG_PATTERN_2_COLOR = 3;
+
     private final String TAG = "OpenGLES20Activity";
 
-    private Handler handler;
+    private OpenGLES20Activity context;
 
     private MyGLRenderer renderer;
 
@@ -39,6 +47,13 @@ public class OpenGLES20Activity extends Activity {
     private int checkedNum = 1;
 
     private TextView tvAngle, tvAngleTotal;
+
+    //private String strLineColor = "#b200ff00";
+    private String strLineColor = "#ff00ff00";
+    private String strHighlightColor = "#4d00ff00";
+    private String strPattern1Color = "#66e9f1f0";
+    private String strPattern2Color = "#6668efad";
+
 
     private Runnable highLightRunnable = new Runnable() {
         @Override
@@ -63,11 +78,11 @@ public class OpenGLES20Activity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        context = this;
+
         glView = new MyGLSurfaceView(this);
         LinearLayout openGlContainer = findViewById(R.id.opengl_container);
         openGlContainer.addView(glView);
-
-        handler = new Handler();
 
         ImageButton btnShowLog = findViewById(R.id.btn_show_log);
         btnShowLog.setOnClickListener(new View.OnClickListener() {
@@ -87,6 +102,32 @@ public class OpenGLES20Activity extends Activity {
         });
 
         /** setting event 설정 **/
+
+        // 배경 변경
+        final RadioGroup radioGroup = findViewById(R.id.rg_background_1);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+
+                switch (checkedId) {
+                    case R.id.rb_background_black:
+                        findViewById(R.id.main_container).setBackgroundColor(Color.rgb(0, 0, 0));
+                        break;
+                    case R.id.rb_background_white:
+                        findViewById(R.id.main_container).setBackgroundColor(Color.rgb(255, 255, 255));
+                        break;
+                    case R.id.rb_background_road_1:
+                        findViewById(R.id.main_container).setBackgroundResource(R.drawable.uturn);
+                        break;
+                    case R.id.rb_background_road_2:
+                        findViewById(R.id.main_container).setBackgroundResource(R.drawable.road2);
+                        break;
+                    case R.id.rb_background_road_3:
+                        findViewById(R.id.main_container).setBackgroundResource(R.drawable.rigthturn2);
+                        break;
+                }
+            }
+        });
 
         // 하이라이트 에니메이션 스위치
         Switch swHighLight = findViewById(R.id.sw_highlight);
@@ -340,10 +381,6 @@ public class OpenGLES20Activity extends Activity {
                         renderer.drawMode = MyGLRenderer.DRAW_NORMAL;
                         glView.requestRender();
                         break;
-                    case R.id.rb_draw_z_spin:
-                        renderer.drawMode = MyGLRenderer.DRAW_Z_SPIN;
-                        glView.requestRender();
-                        break;
                     case R.id.rb_draw_line_dot:
                         renderer.drawMode = MyGLRenderer.DRAW_LINE_DOT;
                         glView.requestRender();
@@ -357,50 +394,6 @@ public class OpenGLES20Activity extends Activity {
                         glView.requestRender();
                         break;
                 }
-            }
-        });
-
-        // Z축 회전 최대각도 설정
-        final TextView tvZAxisMaxDegree = findViewById(R.id.tv_z_axis_spin_max_degree);
-        tvZAxisMaxDegree.setText("" + renderer.degreeLimit);
-
-        findViewById(R.id.btn_z_axis_max_degree_increase).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                renderer.degreeLimit += 1;
-                setText(tvZAxisMaxDegree, renderer.degreeLimit);
-                glView.requestRender();
-            }
-        });
-
-        findViewById(R.id.btn_z_axis_max_degree_decrease).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                renderer.degreeLimit -= 1;
-                setText(tvZAxisMaxDegree, renderer.degreeLimit);
-                glView.requestRender();
-            }
-        });
-
-        // Z축 회전 폭 설정
-        final TextView tvZAxisSpinStride = findViewById(R.id.tv_z_axis_spin_stride);
-        tvZAxisSpinStride.setText("" + renderer.zAxisRotationStride);
-
-        findViewById(R.id.btn_z_axis_stride_increase).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                renderer.zAxisRotationStride += 0.5;
-                setText(tvZAxisSpinStride, renderer.zAxisRotationStride);
-                glView.requestRender();
-            }
-        });
-
-        findViewById(R.id.btn_z_axis_stride_decrease).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                renderer.zAxisRotationStride -= 0.5;
-                setText(tvZAxisSpinStride, renderer.zAxisRotationStride);
-                glView.requestRender();
             }
         });
 
@@ -479,7 +472,7 @@ public class OpenGLES20Activity extends Activity {
         findViewById(R.id.btn_z_spin_stride_increase).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                renderer.zSpintStride += 1.0f;
+                renderer.zSpintStride += 0.5f;
                 setText(tvZAxisStride, renderer.zSpintStride);
             }
         });
@@ -487,10 +480,106 @@ public class OpenGLES20Activity extends Activity {
         findViewById(R.id.btn_z_spin_stride_decrease).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                renderer.zSpintStride -= 1.0f;
+                renderer.zSpintStride -= 0.5f;
                 setText(tvZAxisStride, renderer.zSpintStride);
             }
         });
+
+        // COLOR 설정
+        findViewById(R.id.color_line).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ColorPickerDialog.newBuilder()
+                        .setDialogType(ColorPickerDialog.TYPE_CUSTOM)
+                        .setAllowPresets(false)
+                        .setDialogId(DIALOG_LINE_COLOR)
+                        .setColor(Color.parseColor(strLineColor))
+                        .setShowAlphaSlider(true)
+                        .show(context);
+            }
+        });
+
+        findViewById(R.id.color_highlight).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ColorPickerDialog.newBuilder()
+                        .setDialogType(ColorPickerDialog.TYPE_CUSTOM)
+                        .setAllowPresets(false)
+                        .setDialogId(DIALOG_HIGHLIGHT_COLOR)
+                        .setColor(Color.parseColor(strHighlightColor))
+                        .setShowAlphaSlider(true)
+                        .show(context);
+            }
+        });
+
+        findViewById(R.id.color_pattern_1).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ColorPickerDialog.newBuilder()
+                        .setDialogType(ColorPickerDialog.TYPE_CUSTOM)
+                        .setAllowPresets(false)
+                        .setDialogId(DIALOG_PATTERN_1_COLOR)
+                        .setColor(Color.parseColor(strPattern1Color))
+                        .setShowAlphaSlider(true)
+                        .show(context);
+            }
+        });
+
+        findViewById(R.id.color_pattern_2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ColorPickerDialog.newBuilder()
+                        .setDialogType(ColorPickerDialog.TYPE_CUSTOM)
+                        .setAllowPresets(false)
+                        .setDialogId(DIALOG_PATTERN_2_COLOR)
+                        .setColor(Color.parseColor(strPattern2Color))
+                        .setShowAlphaSlider(true)
+                        .show(context);
+            }
+        });
+    }
+
+    @Override
+    protected void onStop() {
+        eot = true;
+        super.onStop();
+    }
+
+    @Override
+    public void onColorSelected(int dialogId, int color) {
+        float alpha, r, g, b;
+        String strColor = Integer.toHexString(color);
+        alpha = Integer.parseInt("" + strColor.charAt(0) + strColor.charAt(1), 16) / 255.0f;
+        r = (float) Integer.parseInt("" + strColor.charAt(2) + strColor.charAt(3), 16) / 255.0f;
+        g = (float) Integer.parseInt("" + strColor.charAt(4) + strColor.charAt(5), 16) / 255.0f;
+        b = (float) Integer.parseInt("" + strColor.charAt(6) + strColor.charAt(7), 16) / 255.0f;
+        switch (dialogId) {
+            case DIALOG_LINE_COLOR:
+                strLineColor = "#" + strColor;
+                findViewById(R.id.color_line).setBackgroundColor(Color.parseColor(strLineColor));
+                renderer.setLineColor(r, g, b, alpha);
+                break;
+            case DIALOG_HIGHLIGHT_COLOR:
+                strHighlightColor = "#" + strColor;
+                findViewById(R.id.color_highlight).setBackgroundColor(Color.parseColor(strHighlightColor));
+                renderer.setHighlightColor(r, g, b, alpha);
+                break;
+            case DIALOG_PATTERN_1_COLOR:
+                strPattern1Color = "#" + strColor;
+                findViewById(R.id.color_pattern_1).setBackgroundColor(Color.parseColor(strPattern1Color));
+                renderer.setPattern1Color(r, g, b, alpha);
+                break;
+            case DIALOG_PATTERN_2_COLOR:
+                strPattern2Color = "#" + strColor;
+                findViewById(R.id.color_pattern_2).setBackgroundColor(Color.parseColor(strPattern2Color));
+                renderer.setPattern2Color(r, g, b, alpha);
+                break;
+        }
+    }
+
+    @Override
+    public void onDialogDismissed(int dialogId) {
+
     }
 
     public class MyGLSurfaceView extends GLSurfaceView {

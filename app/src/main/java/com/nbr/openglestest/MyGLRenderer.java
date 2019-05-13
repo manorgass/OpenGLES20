@@ -1,10 +1,8 @@
 package com.nbr.openglestest;
 
-
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
-import android.os.SystemClock;
 import android.util.Log;
 
 import com.nbr.openglestest.shapes.LineDot;
@@ -51,10 +49,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     public float eyeZ = 3.4f;
 
     public static final int DRAW_NORMAL = 0;
-    public static final int DRAW_Z_SPIN = 1;
-    public static final int DRAW_LINE_DOT = 2;
-    public static final int DRAW_LINE_CROSS = 3;
-    public static final int DRAW_LINE_TRIANGLE = 4;
+    public static final int DRAW_LINE_DOT = 1;
+    public static final int DRAW_LINE_CROSS = 2;
+    public static final int DRAW_LINE_TRIANGLE = 3;
     int drawMode = 0;
 
     @Override
@@ -107,9 +104,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
         // Create a rotation transformation for the triangle
-        long time = SystemClock.uptimeMillis() % 4000L;
-        float angle = 0.090f * ((int) time);
-
        /* Matrix.setIdentityM(modelMatrix, 0);
         Matrix.translateM(modelMatrix, 0, 0.0f, -1.0f, 2.0f);
         //Matrix.rotateM(modelMatrix, 0, mAngle, 1.0f, 0.0f, 0.0f);
@@ -123,28 +117,25 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         Matrix.setIdentityM(modelMatrix, 0);
         Matrix.translateM(modelMatrix, 0, 0.0f, -1.5f, 0.0f);
 
-        float[] rightLineCoords = new float[arrowNum * 3];
-        float[] leftLineCoords = new float[arrowNum * 3];
+        float[] rightLineCoords;
+        float[] leftLineCoords;
 
 
-        int coordsBufferIndex = 0;
-        float baseX = 0;
-        float baseZ = 0;
-        float yAxisDegree = 0;
-        float drawStride = -0.3f;
+        int coordsBufferIndex;
+        float baseX;
+        float baseZ;
+        float yAxisDegree;
+        float drawStride;
 
         // drawDots arrow
         switch (drawMode) {
             case DRAW_NORMAL:
                 for (int i = 0; i < arrowNum; i++) {
-                    //Matrix.rotateM(modelMatrix, 0, mAngle, 0.0f, 0.0f, 1.0f);
-                    //Matrix.rotateM(modelMatrix, 0, i, 0.0f, 0.0f, 1.0f);
                     Matrix.translateM(modelMatrix, 0, 0.0f, 0.0f, -0.3f);
                     if (i > rotationStartIndex
                             && ((i - rotationStartIndex) * mAngle < maxAngle && (i - rotationStartIndex) * mAngle > -maxAngle)) {
                         Matrix.rotateM(modelMatrix, 0, mAngle, arrowRotationAxis_x, arrowRotationAxis_y, arrowRotationAxis_z);
                     }
-                    //Matrix.rotateM(modelMatrix, 0, 1, 0.0f, 1.0f, 0.0f);
 
                     Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelMatrix, 0);
                     Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);
@@ -157,47 +148,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                             simpleArrow.draw(mvpMatrix, 2);
                     }
                 }
-                break;
-            case DRAW_Z_SPIN: // 좌회전
-                for (int i = 0; i < arrowNum; i++) {
-                    Matrix.translateM(modelMatrix, 0, 0.0f, 0.0f, -0.3f);
-                    if (i > rotationStartIndex) {
-                        if (((i - rotationStartIndex) * mAngle < 100 && (i - rotationStartIndex) * mAngle > -100)) {
-                            Matrix.rotateM(modelMatrix, 0, mAngle, (float) Math.sin(Math.toRadians(zAxisRotationDegree)), (float) Math.cos(Math.toRadians(zAxisRotationDegree)), 0.0f);
-
-                        }
-                        //if (zAxisRotationDegree < 90)
-
-                        switch (flag) {
-                            case 0: // up
-                                Matrix.rotateM(modelMatrix, 0, zAxisRotationStride, 0.0f, 0.0f, 1.0f);
-                                zAxisRotationDegree += zAxisRotationStride;
-                                break;
-                            case 1: // down
-                                Matrix.rotateM(modelMatrix, 0, -zAxisRotationStride, 0.0f, 0.0f, 1.0f);
-                                zAxisRotationDegree -= zAxisRotationStride;
-                                break;
-                        }
-
-                        if (zAxisRotationDegree > degreeLimit) flag = 1;
-                        else if (zAxisRotationDegree <= 0) flag = 2;
-
-                    }
-
-                    Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelMatrix, 0);
-                    Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);
-
-
-                    if (highLightIndex >= i && highLightIndex <= i + highLightArrowNum) {
-                        simpleArrow.draw(mvpMatrix, 0);
-                    } else {
-                        if (i % 2 == 0)
-                            simpleArrow.draw(mvpMatrix, 1);
-                        else
-                            simpleArrow.draw(mvpMatrix, 2);
-                    }
-                }
-                flag = 0;
                 break;
             case DRAW_LINE_DOT:
                 rightLineCoords = new float[arrowNum * 3];
@@ -208,11 +158,19 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                 yAxisDegree = 0;
                 drawStride = -0.3f;
 
-                // 시작점은 0,0
-                /*leftLineCoords[coordsBufferIndex] = 0.0f;
-                leftLineCoords[coordsBufferIndex + 1] = 0.0f;
-                leftLineCoords[coordsBufferIndex + 2] = 0.0f;
-                coordsBufferIndex += 3;*/
+                zSpinSum = 0;
+
+                int dotCount = ((int) (lineStride * 10) - 1) * 2 + 1;
+                float[] dotsCoords = new float[dotCount * 3];
+                for (int i = ((int) (lineStride * 10) - 1) * -1; i < (int) (lineStride * 10); i++) {
+                    dotsCoords[coordsBufferIndex] = (float) i / 10.0f;
+                    dotsCoords[coordsBufferIndex + 1] = 0.0f;
+                    dotsCoords[coordsBufferIndex + 2] = 0.0f;
+                    coordsBufferIndex += 3;
+                }
+                lineDot.setDotsVertexBuffer(dotsCoords);
+
+                coordsBufferIndex = 0;
 
                 for (int i = 0; i < arrowNum; i++) {
                     if (i > rotationStartIndex && ((i - rotationStartIndex) * mAngle < maxAngle && (i - rotationStartIndex) * mAngle > -maxAngle)) {
@@ -240,10 +198,31 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                     // index 증가
                     coordsBufferIndex += 3;
 
+                    // 하이라이트 화살표 메트릭스 초기화
+                    System.arraycopy(modelMatrix, 0, highlightArrowModelMatrix, 0, 16);
+                    // 최대 회전 각보다 작은 경우 stride 만큼 z축으로 회전. 사용자가 지정한 앵글의 부호에 따라 + / - 를 정해준다.
+                    if (i > rotationStartIndex) {
+                        if (zSpinSum < zSpinLimit) {
+                            if (mAngle > 0)
+                                Matrix.rotateM(highlightArrowModelMatrix, 0, zSpinSum, 0.0f, 0.0f, 1.0f);
+                            else
+                                Matrix.rotateM(highlightArrowModelMatrix, 0, -zSpinSum, 0.0f, 0.0f, 1.0f);
+                            zSpinSum += zSpintStride;
+                        } else {
+                            if (mAngle > 0)
+                                Matrix.rotateM(highlightArrowModelMatrix, 0, zSpinSum, 0.0f, 0.0f, 1.0f);
+                            else
+                                Matrix.rotateM(highlightArrowModelMatrix, 0, -zSpinSum, 0.0f, 0.0f, 1.0f);
+                        }
+                    }
+
                     Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelMatrix, 0);
                     Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);
                     if (highLightIndex >= i && highLightIndex <= i + highLightArrowNum) {
                         lineDot.drawDots(mvpMatrix, 0);
+                        Matrix.multiplyMM(highlightArrowMvpMatrix, 0, viewMatrix, 0, highlightArrowModelMatrix, 0);
+                        Matrix.multiplyMM(highlightArrowMvpMatrix, 0, projectionMatrix, 0, highlightArrowMvpMatrix, 0);
+                        lineDot.drawHighLightArrow(highlightArrowMvpMatrix);
                     } else {
                         if (i % 2 == 0) lineDot.drawDots(mvpMatrix, 1);
                         else lineDot.drawDots(mvpMatrix, 2);
@@ -275,6 +254,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                 baseZ = 0;
                 yAxisDegree = 0;
                 drawStride = -0.3f;
+
+                zSpinSum = 0;
 
                 int vertexStride = 3;
                 int crossPerVertexNumber = 4;
@@ -310,6 +291,24 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                         yAxisDegree %= 360;
                     }
 
+                    // 하이라이트 화살표 메트릭스 초기화
+                    System.arraycopy(modelMatrix, 0, highlightArrowModelMatrix, 0, 16);
+                    // 최대 회전 각보다 작은 경우 stride 만큼 z축으로 회전. 사용자가 지정한 앵글의 부호에 따라 + / - 를 정해준다.
+                    if (i > rotationStartIndex) {
+                        if (zSpinSum < zSpinLimit) {
+                            if (mAngle > 0)
+                                Matrix.rotateM(highlightArrowModelMatrix, 0, zSpinSum, 0.0f, 0.0f, 1.0f);
+                            else
+                                Matrix.rotateM(highlightArrowModelMatrix, 0, -zSpinSum, 0.0f, 0.0f, 1.0f);
+                            zSpinSum += zSpintStride;
+                        } else {
+                            if (mAngle > 0)
+                                Matrix.rotateM(highlightArrowModelMatrix, 0, zSpinSum, 0.0f, 0.0f, 1.0f);
+                            else
+                                Matrix.rotateM(highlightArrowModelMatrix, 0, -zSpinSum, 0.0f, 0.0f, 1.0f);
+                        }
+                    }
+
                     // line coords 계산
                     if (coordsBufferIndex == rightLineCoords.length) break;
                     rightLineCoords[coordsBufferIndex] = baseX + (lineStride * (float) Math.sin(Math.toRadians(90 + yAxisDegree)));
@@ -329,6 +328,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                     Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);
                     if (highLightIndex >= i && highLightIndex <= i + highLightArrowNum) {
                         lineDot.drawCross(mvpMatrix, 0);
+                        Matrix.multiplyMM(highlightArrowMvpMatrix, 0, viewMatrix, 0, highlightArrowModelMatrix, 0);
+                        Matrix.multiplyMM(highlightArrowMvpMatrix, 0, projectionMatrix, 0, highlightArrowMvpMatrix, 0);
+                        lineDot.drawHighLightArrow(highlightArrowMvpMatrix);
                     } else {
                         if (i % 2 == 0) lineDot.drawCross(mvpMatrix, 1);
                         else lineDot.drawCross(mvpMatrix, 2);
@@ -336,6 +338,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
                     Matrix.translateM(modelMatrix, 0, 0.0f, 0.0f, drawStride);
                 }
+
 
                 lineDot.setLineVertexBuffer(leftLineCoords);
                 Matrix.setIdentityM(modelMatrix, 0);
@@ -400,26 +403,33 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                 lineDot.setTriangleVertexBuffer(triangleCoords);
                 coordsBufferIndex = 0;
                 for (int i = 0; i < arrowNum; i++) {
+
                     if (i > rotationStartIndex && ((i - rotationStartIndex) * mAngle < maxAngle && (i - rotationStartIndex) * mAngle > -maxAngle)) {
                         Matrix.rotateM(modelMatrix, 0, mAngle, arrowRotationAxis_x, arrowRotationAxis_y, arrowRotationAxis_z);
-
-                        // 하이라이트 화살표 메트릭스 초기화
-                        System.arraycopy(modelMatrix, 0, highlightArrowModelMatrix, 0, 16);
-                        // 최대 회전 각보다 작은 경우 stride 만큼 z축으로 회전. 사용자가 지정한 앵글의 부호에 따라 + / - 를 정해준다.
-                        if (zSpinSum < zSpinLimit) {
-                            if (mAngle > 0)
-                                Matrix.rotateM(highlightArrowModelMatrix, 0, zSpintStride, 0.0f, 0.0f, 1.0f);
-                            else
-                                Matrix.rotateM(highlightArrowModelMatrix, 0, -zSpintStride, 0.0f, 0.0f, 1.0f);
-                            zSpinSum += zSpintStride;
-                        }
 
                         // 회전 각도 계산
                         yAxisDegree += mAngle;
                         yAxisDegree %= 360;
-                    } else {
-                        System.arraycopy(modelMatrix, 0, highlightArrowModelMatrix, 0, 16);
                     }
+
+                    // 하이라이트 화살표 메트릭스 초기화
+                    System.arraycopy(modelMatrix, 0, highlightArrowModelMatrix, 0, 16);
+                    // 최대 회전 각보다 작은 경우 stride 만큼 z축으로 회전. 사용자가 지정한 앵글의 부호에 따라 + / - 를 정해준다.
+                    if (i > rotationStartIndex) {
+                        if (zSpinSum < zSpinLimit) {
+                            if (mAngle > 0)
+                                Matrix.rotateM(highlightArrowModelMatrix, 0, zSpinSum, 0.0f, 0.0f, 1.0f);
+                            else
+                                Matrix.rotateM(highlightArrowModelMatrix, 0, -zSpinSum, 0.0f, 0.0f, 1.0f);
+                            zSpinSum += zSpintStride;
+                        } else {
+                            if (mAngle > 0)
+                                Matrix.rotateM(highlightArrowModelMatrix, 0, zSpinSum, 0.0f, 0.0f, 1.0f);
+                            else
+                                Matrix.rotateM(highlightArrowModelMatrix, 0, -zSpinSum, 0.0f, 0.0f, 1.0f);
+                        }
+                    }
+
 
                     // line coords 계산
                     if (coordsBufferIndex == rightLineCoords.length) break;
@@ -483,12 +493,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         lineDot.setHighLightArrowVertexBuffer(highlightArrowCoords);
     }
 
-
-    int flag;
-    float zAxisRotationDegree = 0;
-    public float zAxisRotationStride = 1;
-    public int degreeLimit = 30;
-
     @Override
     public void onSurfaceChanged(GL10 unused, int width, int height) {
         GLES20.glViewport(0, 0, width, height);
@@ -524,7 +528,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
     }
 
-
     public void updateCameraPosition() {
         // Position the eye in front of the origin.
         final float eyeX = 0.0f;
@@ -547,4 +550,34 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                 lookX, lookY, lookZ,
                 upX, upY, upZ);
     }
+
+    public void setLineColor(float r, float g, float b, float alpha) {
+        lineDot.colorLine[0] = r;
+        lineDot.colorLine[1] = g;
+        lineDot.colorLine[2] = b;
+        lineDot.colorLine[3] = alpha;
+    }
+
+    public void setHighlightColor(float r, float g, float b, float alpha) {
+        lineDot.colorHighlightArrow[0] = r;
+        lineDot.colorHighlightArrow[1] = g;
+        lineDot.colorHighlightArrow[2] = b;
+        lineDot.colorHighlightArrow[3] = alpha;
+    }
+
+    public void setPattern1Color(float r, float g, float b, float alpha) {
+        lineDot.color[0] = r;
+        lineDot.color[1] = g;
+        lineDot.color[2] = b;
+        lineDot.color[3] = alpha;
+    }
+
+    public void setPattern2Color(float r, float g, float b, float alpha) {
+        lineDot.color1[0] = r;
+        lineDot.color1[1] = g;
+        lineDot.color1[2] = b;
+        lineDot.color1[3] = alpha;
+    }
+
+
 }
