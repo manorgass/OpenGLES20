@@ -1,14 +1,15 @@
 package com.nbr.openglestest;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
@@ -79,6 +80,13 @@ public class OpenGLES20Activity extends AppCompatActivity implements ColorPicker
         setContentView(R.layout.activity_main);
 
         context = this;
+
+        // Hide the status bar
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        // Hide the action bar
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null)
+            getSupportActionBar().hide();
 
         glView = new MyGLSurfaceView(this);
         LinearLayout openGlContainer = findViewById(R.id.opengl_container);
@@ -302,12 +310,12 @@ public class OpenGLES20Activity extends AppCompatActivity implements ColorPicker
 
         // 최대 회전각 설정
         final TextView tvMaxAngle = findViewById(R.id.tv_max_angle);
-        setText(tvMaxAngle, renderer.maxAngle);
+        setText(tvMaxAngle, renderer.mainMaxAngle);
         findViewById(R.id.btn_max_angle_increase).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                renderer.maxAngle += 10;
-                setText(tvMaxAngle, renderer.maxAngle);
+                renderer.mainMaxAngle += 10;
+                setText(tvMaxAngle, renderer.mainMaxAngle);
                 glView.requestRender();
             }
         });
@@ -315,9 +323,9 @@ public class OpenGLES20Activity extends AppCompatActivity implements ColorPicker
         findViewById(R.id.btn_max_angle_decrease).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (renderer.maxAngle > 10) {
-                    renderer.maxAngle -= 10;
-                    setText(tvMaxAngle, renderer.maxAngle);
+                if (renderer.mainMaxAngle > 10) {
+                    renderer.mainMaxAngle -= 10;
+                    setText(tvMaxAngle, renderer.mainMaxAngle);
                     glView.requestRender();
                 }
             }
@@ -449,39 +457,39 @@ public class OpenGLES20Activity extends AppCompatActivity implements ColorPicker
 
         // 하이라이트 화살표 z 축 회전 최대 각도 설정
         final TextView tvMaxZAxisDegree = findViewById(R.id.tv_max_z_axis_degree);
-        setText(tvMaxZAxisDegree, renderer.zSpinLimit);
+        setText(tvMaxZAxisDegree, renderer.zMaxAngle);
         findViewById(R.id.btn_max_z_axis_degree_increase).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                renderer.zSpinLimit += 3.0f;
-                setText(tvMaxZAxisDegree, renderer.zSpinLimit);
+                renderer.zMaxAngle += 3.0f;
+                setText(tvMaxZAxisDegree, renderer.zMaxAngle);
             }
         });
 
         findViewById(R.id.btn_max_z_axis_degree_decrease).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                renderer.zSpinLimit -= 3.0f;
-                setText(tvMaxZAxisDegree, renderer.zSpinLimit);
+                renderer.zMaxAngle -= 3.0f;
+                setText(tvMaxZAxisDegree, renderer.zMaxAngle);
             }
         });
 
         // 하이라이트 화살표 z 축 1회 회전 시 각도 변경 폭 설정
         final TextView tvZAxisStride = findViewById(R.id.tv_z_spin_stride);
-        setText(tvZAxisStride, renderer.zSpintStride);
+        setText(tvZAxisStride, renderer.zRotateStride);
         findViewById(R.id.btn_z_spin_stride_increase).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                renderer.zSpintStride += 0.5f;
-                setText(tvZAxisStride, renderer.zSpintStride);
+                renderer.zRotateStride += 0.5f;
+                setText(tvZAxisStride, renderer.zRotateStride);
             }
         });
 
         findViewById(R.id.btn_z_spin_stride_decrease).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                renderer.zSpintStride -= 0.5f;
-                setText(tvZAxisStride, renderer.zSpintStride);
+                renderer.zRotateStride -= 0.5f;
+                setText(tvZAxisStride, renderer.zRotateStride);
             }
         });
 
@@ -545,34 +553,43 @@ public class OpenGLES20Activity extends AppCompatActivity implements ColorPicker
         super.onStop();
     }
 
+    /**
+     * Color Picker Selected Listener
+     *
+     * 색상 선택 다이어로그에서 색상을 선택 시 해당 call back 이 호출됨.
+     *
+     * @param dialogId 호출 시 설정한 다이어로그 아이디. 어느 용도로 호출했는지 구분하기 위해 사용.
+     * @param color 선택한 색상. int는 4바이트 이므로 0xAARRGGBB 형태로 값이 들어있다.
+     */
     @Override
     public void onColorSelected(int dialogId, int color) {
-        float alpha, r, g, b;
-        String strColor = Integer.toHexString(color);
-        alpha = Integer.parseInt("" + strColor.charAt(0) + strColor.charAt(1), 16) / 255.0f;
-        r = (float) Integer.parseInt("" + strColor.charAt(2) + strColor.charAt(3), 16) / 255.0f;
-        g = (float) Integer.parseInt("" + strColor.charAt(4) + strColor.charAt(5), 16) / 255.0f;
-        b = (float) Integer.parseInt("" + strColor.charAt(6) + strColor.charAt(7), 16) / 255.0f;
+        float a, r, g, b;
+        String strColor = Integer.toHexString(color); // aarrggbb 형태의 string으로 변환
+        /* 단순하고 무식하게 처리! a r g b 값을 split 후, OpenGL GLSL 가 이해할 수 있도록 float 형태로 변환  */
+        a = (float)Integer.parseInt("" + strColor.charAt(0) + strColor.charAt(1), 16) / 255.0f;
+        r = (float)Integer.parseInt("" + strColor.charAt(2) + strColor.charAt(3), 16) / 255.0f;
+        g = (float)Integer.parseInt("" + strColor.charAt(4) + strColor.charAt(5), 16) / 255.0f;
+        b = (float)Integer.parseInt("" + strColor.charAt(6) + strColor.charAt(7), 16) / 255.0f;
         switch (dialogId) {
             case DIALOG_LINE_COLOR:
-                strLineColor = "#" + strColor;
+                strLineColor = "#" + strColor; // 앞에 #을 안붙여주면 색상 문자열로 인식 못함.
                 findViewById(R.id.color_line).setBackgroundColor(Color.parseColor(strLineColor));
-                renderer.setLineColor(r, g, b, alpha);
+                renderer.setLineColor(r, g, b, a);
                 break;
             case DIALOG_HIGHLIGHT_COLOR:
                 strHighlightColor = "#" + strColor;
                 findViewById(R.id.color_highlight).setBackgroundColor(Color.parseColor(strHighlightColor));
-                renderer.setHighlightColor(r, g, b, alpha);
+                renderer.setHighlightColor(r, g, b, a);
                 break;
             case DIALOG_PATTERN_1_COLOR:
                 strPattern1Color = "#" + strColor;
                 findViewById(R.id.color_pattern_1).setBackgroundColor(Color.parseColor(strPattern1Color));
-                renderer.setPattern1Color(r, g, b, alpha);
+                renderer.setPattern1Color(r, g, b, a);
                 break;
             case DIALOG_PATTERN_2_COLOR:
                 strPattern2Color = "#" + strColor;
                 findViewById(R.id.color_pattern_2).setBackgroundColor(Color.parseColor(strPattern2Color));
-                renderer.setPattern2Color(r, g, b, alpha);
+                renderer.setPattern2Color(r, g, b, a);
                 break;
         }
     }
@@ -624,10 +641,10 @@ public class OpenGLES20Activity extends AppCompatActivity implements ColorPicker
                     // revers direction of rotation to  left of the mid-line
                     if (x < getWidth() / 2) dy *= -1;
 
-                    float angle = renderer.getAngle() + ((dx + dy) * TOUCH_SCALE_FACTOR);
+                    float angle = renderer.getyRotateStride() + ((dx + dy) * TOUCH_SCALE_FACTOR);
                     tvAngle.setText("Angle : " + Float.toString(angle));
                     tvAngleTotal.setText("Angle Total : " + Float.toString(angle * (renderer.arrowNum - renderer.rotationStartIndex)));
-                    renderer.setAngle(angle);
+                    renderer.setyRotateStride(angle);
                     requestRender();
 
                     break;

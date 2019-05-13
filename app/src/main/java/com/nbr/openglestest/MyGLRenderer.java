@@ -7,7 +7,6 @@ import android.util.Log;
 
 import com.nbr.openglestest.shapes.LineDot;
 import com.nbr.openglestest.shapes.SimpleArrow;
-import com.nbr.openglestest.shapes.Triangle;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -19,40 +18,58 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class MyGLRenderer implements GLSurfaceView.Renderer {
     private final String TAG = this.getClass().getSimpleName();
+    // draw mode
+    static final int DRAW_NORMAL = 0;           // 일반 화살표
+    static final int DRAW_LINE_DOT = 1;         // 선과 점
+    static final int DRAW_LINE_CROSS = 2;       // 선과 십자가
+    static final int DRAW_LINE_TRIANGLE = 3;    // 선과 삼각형
 
-    private Triangle mTriangle;
+    // 일반적인 화살표 모양의 shape
     private SimpleArrow simpleArrow;
+    // 선과 관련된 shape
     private LineDot lineDot;
 
+    // projection matrix
     private float[] projectionMatrix = new float[16];
+    // view matrix
     private float[] viewMatrix = new float[16];
+    // model - view - projection matrix
     private float[] mvpMatrix = new float[16];
+    // model matrix
     private float[] modelMatrix = new float[16];
 
+    // highlight arrow's model matrix
     private float[] highlightArrowModelMatrix = new float[16];
+    // highlight arrow's model - view - projection matrix
     private float[] highlightArrowMvpMatrix = new float[16];
 
-    public int highLightArrowNum = 3;
-    public int highLightIndex = -1;
 
-    public int arrowNum = 80;
+    // Highlight 갯수를 설정
+    int highLightArrowNum = 3;
+    int highLightIndex = -1;
 
-    public float arrowRotationAxis_x = 0.0f;
-    public float arrowRotationAxis_y = 1.0f;
-    public float arrowRotationAxis_z = 0.0f;
+    // 화면에 나타낼 객체의 갯수를 저장
+    int arrowNum = 80;
 
-    public int rotationStartIndex = 10;
-
-    public int maxAngle = 190;
-
-    public float eyeY = 0.25f;
-    public float eyeZ = 3.4f;
-
-    public static final int DRAW_NORMAL = 0;
-    public static final int DRAW_LINE_DOT = 1;
-    public static final int DRAW_LINE_CROSS = 2;
-    public static final int DRAW_LINE_TRIANGLE = 3;
+    // rotation setting 관련 변수. 사용자 터치에 의해 회전할 축을 결정
+    float arrowRotationAxis_x = 0.0f;
+    float arrowRotationAxis_y = 1.0f;
+    float arrowRotationAxis_z = 0.0f;
+    // 회전 시작 인덱스
+    int rotationStartIndex = 10;
+    // 최대 회전각. 해당 각도 이상으로 꺾이지 않음.
+    int mainMaxAngle = 190;
+    // camera의 위치. z축은 값이 커질수록 객체와 멀어짐.
+    float eyeY = 0.25f;
+    float eyeZ = 3.4f;
+    // draw flag. 해당 값을 통해 무엇을 그릴지 결정
     int drawMode = 0;
+    // highlight arrow 의 z-axis 회전 관련 변수
+
+    float zMaxAngle = 0;           // 최대 회전각
+    float zRotateStride = 3.0f;      // 회전 폭
+    // activity의 touch event 를 통해 유저가 원하는 회전각을 저장
+    private float yRotateStride;
 
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
@@ -86,8 +103,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                 lookX, lookY, lookZ,
                 upX, upY, upZ);
 
-        // init a triangle
-        mTriangle = new Triangle();
+        // init shapes
         simpleArrow = new SimpleArrow();
         lineDot = new LineDot();
 
@@ -103,63 +119,68 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // Redraw background color
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
-        // Create a rotation transformation for the triangle
-       /* Matrix.setIdentityM(modelMatrix, 0);
-        Matrix.translateM(modelMatrix, 0, 0.0f, -1.0f, 2.0f);
-        //Matrix.rotateM(modelMatrix, 0, mAngle, 1.0f, 0.0f, 0.0f);
-        Matrix.rotateM(modelMatrix, 0, mAngle, 0.0f, 1.0f, 0.0f);
-        Matrix.rotateM(modelMatrix, 0, -90.0f, 1.0f, 0.0f, 0.0f);
-        Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelMatrix, 0);
-        Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);
-        mTriangle.drawDots(mvpMatrix);*/
-
-
         Matrix.setIdentityM(modelMatrix, 0);
         Matrix.translateM(modelMatrix, 0, 0.0f, -1.5f, 0.0f);
 
+        // 좌/우 line의 좌표를 저장할 float 배열
         float[] rightLineCoords;
         float[] leftLineCoords;
 
-
+        // 정점 버퍼 인덱스
         int coordsBufferIndex;
-        float baseX;
-        float baseZ;
-        float yAxisDegree;
+        // 지속적인 rotation과 translate 시 좌표 계산을 위한 기준점을 저장
+        float baseX, baseZ;
+        // 사용자 터치 조작에 의한 y축 총 회전각을 저장
+        float yRotateDegree;
+        // highlight arrow의 총 회전각을 저장
+        float zRotateDegree;
+        // Object 간 z축 간격
         float drawStride;
 
         // drawDots arrow
         switch (drawMode) {
+            // 기본 형태의 사각형 화살표 그리기
             case DRAW_NORMAL:
+                yRotateDegree = 0;
+                drawStride = -0.3f;
                 for (int i = 0; i < arrowNum; i++) {
-                    Matrix.translateM(modelMatrix, 0, 0.0f, 0.0f, -0.3f);
-                    if (i > rotationStartIndex
-                            && ((i - rotationStartIndex) * mAngle < maxAngle && (i - rotationStartIndex) * mAngle > -maxAngle)) {
-                        Matrix.rotateM(modelMatrix, 0, mAngle, arrowRotationAxis_x, arrowRotationAxis_y, arrowRotationAxis_z);
+                    Matrix.translateM(modelMatrix, 0, 0.0f, 0.0f, drawStride);
+                    if (Math.abs(yRotateDegree) < mainMaxAngle && rotationStartIndex < i) {
+                        // 다음 회전이 최대각을 넘는 경우 최대각으로 만들어줌.
+                        if (Math.abs(yRotateDegree + yRotateStride) > mainMaxAngle) {
+                            if (yRotateStride > 0)  // 각이 양수인 경우 max - currentDegree 만큼 회전
+                                Matrix.rotateM(modelMatrix, 0, mainMaxAngle - yRotateDegree, arrowRotationAxis_x, arrowRotationAxis_y, arrowRotationAxis_z);
+                            else  // 각이 음수인 경우 -(max + currentDegree) 만큼 회전
+                                Matrix.rotateM(modelMatrix, 0, -(mainMaxAngle + yRotateDegree), arrowRotationAxis_x, arrowRotationAxis_y, arrowRotationAxis_z);
+                        } else {
+                            Matrix.rotateM(modelMatrix, 0, yRotateStride, arrowRotationAxis_x, arrowRotationAxis_y, arrowRotationAxis_z);
+                        }
+                        yRotateDegree += yRotateStride;
                     }
-
+                    // Model - View - Projection Matrix 계산
                     Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelMatrix, 0);
                     Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);
-                    if (highLightIndex >= i && highLightIndex <= i + highLightArrowNum) {
+                    // 하이라이트 처리
+                    if (highLightIndex >= i && highLightIndex <= i + highLightArrowNum)
                         simpleArrow.draw(mvpMatrix, 0);
-                    } else {
-                        if (i % 2 == 0)
-                            simpleArrow.draw(mvpMatrix, 1);
-                        else
-                            simpleArrow.draw(mvpMatrix, 2);
-                    }
+                    else
+                        simpleArrow.draw(mvpMatrix, i % 2 == 0 ? 1 : 2);
                 }
                 break;
+
+            // 선과 점으로 방향신호를 표현
             case DRAW_LINE_DOT:
                 rightLineCoords = new float[arrowNum * 3];
                 leftLineCoords = new float[arrowNum * 3];
                 coordsBufferIndex = 0;
                 baseX = 0;
                 baseZ = 0;
-                yAxisDegree = 0;
+                yRotateDegree = 0;
                 drawStride = -0.3f;
 
-                zSpinSum = 0;
+                zRotateDegree = 0;
 
+                // line stride 를 기준으로 화면에 그릴 점들의 좌표 계산
                 int dotCount = ((int) (lineStride * 10) - 1) * 2 + 1;
                 float[] dotsCoords = new float[dotCount * 3];
                 for (int i = ((int) (lineStride * 10) - 1) * -1; i < (int) (lineStride * 10); i++) {
@@ -173,61 +194,66 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                 coordsBufferIndex = 0;
 
                 for (int i = 0; i < arrowNum; i++) {
-                    if (i > rotationStartIndex && ((i - rotationStartIndex) * mAngle < maxAngle && (i - rotationStartIndex) * mAngle > -maxAngle)) {
-                        Matrix.rotateM(modelMatrix, 0, mAngle, arrowRotationAxis_x, arrowRotationAxis_y, arrowRotationAxis_z);
-                        // 회전 각도 계산
-                        yAxisDegree += mAngle;
-                        yAxisDegree %= 360;
+                    // 총 회전된 각도가 최대 각을 넘지 않고, 현재 그리는 순번이 회전 시작 index보다 큰 경우에만 회전
+                    if (Math.abs(yRotateDegree) < mainMaxAngle && i > rotationStartIndex) {
+                        // 다음 회전이 최대각을 넘는 경우 최대각으로 만들어줌.
+                        if (Math.abs(yRotateDegree + yRotateStride) > mainMaxAngle) {
+                            if (yRotateStride > 0)  // 각이 양수인 경우 max - currentDegree 만큼 회전
+                                Matrix.rotateM(modelMatrix, 0, mainMaxAngle - yRotateDegree, arrowRotationAxis_x, arrowRotationAxis_y, arrowRotationAxis_z);
+                            else  // 각이 음수인 경우 -(max + currentDegree) 만큼 회전
+                                Matrix.rotateM(modelMatrix, 0, -(mainMaxAngle + yRotateDegree), arrowRotationAxis_x, arrowRotationAxis_y, arrowRotationAxis_z);
+
+                            yRotateDegree = mainMaxAngle * (yRotateStride > 0 ? 1 : -1);
+                        } else {
+                            Matrix.rotateM(modelMatrix, 0, yRotateStride, arrowRotationAxis_x, arrowRotationAxis_y, arrowRotationAxis_z);
+                            // 총 회전각도 업데이트
+                            yRotateDegree += yRotateStride;
+                        }
                     }
 
                     // line coords 계산
                     if (coordsBufferIndex == rightLineCoords.length) break;
                     // x axis position
-                    rightLineCoords[coordsBufferIndex] = baseX + (lineStride * (float) Math.sin(Math.toRadians(90 + yAxisDegree)));
-                    leftLineCoords[coordsBufferIndex] = baseX + (lineStride * (float) Math.sin(Math.toRadians(-90 + yAxisDegree)));
-                    // y axis position (초기값이 0이므로 굳이 값을 대입하지 않음)
-                    // rightLineCoords[coordsBufferIndex + 1] = 0;
+                    rightLineCoords[coordsBufferIndex] = baseX + (lineStride * (float) Math.sin(Math.toRadians(90 + yRotateDegree)));
+                    leftLineCoords[coordsBufferIndex] = baseX + (lineStride * (float) Math.sin(Math.toRadians(-90 + yRotateDegree)));
+                    // y axis position 값은 0으로 고정이며, 초기값이 0이므로 굳이 값을 대입하지 않음
                     // z axis position
-                    rightLineCoords[coordsBufferIndex + 2] = baseZ + (lineStride * (float) Math.cos(Math.toRadians(90 + yAxisDegree)));
-                    leftLineCoords[coordsBufferIndex + 2] = baseZ + (lineStride * (float) Math.cos(Math.toRadians(-90 + yAxisDegree)));
+                    rightLineCoords[coordsBufferIndex + 2] = baseZ + (lineStride * (float) Math.cos(Math.toRadians(90 + yRotateDegree)));
+                    leftLineCoords[coordsBufferIndex + 2] = baseZ + (lineStride * (float) Math.cos(Math.toRadians(-90 + yRotateDegree)));
 
+                    // 다음 line 좌표 계산 시 중점이 될 base 좌표를 갱신
+                    baseX += drawStride * (float) Math.sin(Math.toRadians(yRotateDegree));
+                    baseZ += drawStride * (float) Math.cos(Math.toRadians(yRotateDegree));
 
-                    baseX += drawStride * (float) Math.sin(Math.toRadians(yAxisDegree));
-                    baseZ += drawStride * (float) Math.cos(Math.toRadians(yAxisDegree));
-
-                    // index 증가
+                    // x, y, z 축의 값을 업데이트 했으므로 다음 x좌표 값 갱신을 위해 좌표 index를 vertex stirde인 3만큼 증가
                     coordsBufferIndex += 3;
 
-                    // 하이라이트 화살표 메트릭스 초기화
+                    // 하이라이트 화살표 메트릭스 초기화.
+                    // model matrix를 복사하는 이유는 해당 model matrix와 동일한 위치에서 z축 회전만 시킬 것이기 때문이다.
+                    // 계속해서 z축으로 직진하는 컨셉이므로 해당 축을 건드리면 전체 3축이 변형되어 밑으로 혹은 위로 점점 올라간다.
                     System.arraycopy(modelMatrix, 0, highlightArrowModelMatrix, 0, 16);
+
                     // 최대 회전 각보다 작은 경우 stride 만큼 z축으로 회전. 사용자가 지정한 앵글의 부호에 따라 + / - 를 정해준다.
                     if (i > rotationStartIndex) {
-                        if (zSpinSum < zSpinLimit) {
-                            if (mAngle > 0)
-                                Matrix.rotateM(highlightArrowModelMatrix, 0, zSpinSum, 0.0f, 0.0f, 1.0f);
-                            else
-                                Matrix.rotateM(highlightArrowModelMatrix, 0, -zSpinSum, 0.0f, 0.0f, 1.0f);
-                            zSpinSum += zSpintStride;
-                        } else {
-                            if (mAngle > 0)
-                                Matrix.rotateM(highlightArrowModelMatrix, 0, zSpinSum, 0.0f, 0.0f, 1.0f);
-                            else
-                                Matrix.rotateM(highlightArrowModelMatrix, 0, -zSpinSum, 0.0f, 0.0f, 1.0f);
-                        }
+                        Matrix.rotateM(highlightArrowModelMatrix, 0, yRotateStride > 0 ? zRotateDegree : -zRotateDegree, 0.0f, 0.0f, 1.0f);
+                        if (zRotateDegree < zMaxAngle) zRotateDegree += zRotateStride;
                     }
 
+                    // mvp matrix 계산
                     Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelMatrix, 0);
                     Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);
+                    // 하이라이트 분기처리
                     if (highLightIndex >= i && highLightIndex <= i + highLightArrowNum) {
                         lineDot.drawDots(mvpMatrix, 0);
+                        // 하이라이트 위치에서만 하이라이트 오브젝트를 그려준다.
                         Matrix.multiplyMM(highlightArrowMvpMatrix, 0, viewMatrix, 0, highlightArrowModelMatrix, 0);
                         Matrix.multiplyMM(highlightArrowMvpMatrix, 0, projectionMatrix, 0, highlightArrowMvpMatrix, 0);
                         lineDot.drawHighLightArrow(highlightArrowMvpMatrix);
                     } else {
-                        if (i % 2 == 0) lineDot.drawDots(mvpMatrix, 1);
-                        else lineDot.drawDots(mvpMatrix, 2);
+                        // 번갈아가면서 road 색상을 변경해준다.
+                        lineDot.drawDots(mvpMatrix, i % 2 == 0 ? 1 : 2);
                     }
-
+                    // draw stride 만큼 z축으로 이동
                     Matrix.translateM(modelMatrix, 0, 0.0f, 0.0f, drawStride);
                 }
 
@@ -252,10 +278,10 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                 coordsBufferIndex = 0;
                 baseX = 0;
                 baseZ = 0;
-                yAxisDegree = 0;
+                yRotateDegree = 0;
                 drawStride = -0.3f;
 
-                zSpinSum = 0;
+                zRotateDegree = 0;
 
                 int vertexStride = 3;
                 int crossPerVertexNumber = 4;
@@ -284,41 +310,41 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                 lineDot.setCrossVertexBuffer(crossCoords);
                 coordsBufferIndex = 0;
                 for (int i = 0; i < arrowNum; i++) {
-                    if (i > rotationStartIndex && ((i - rotationStartIndex) * mAngle < maxAngle && (i - rotationStartIndex) * mAngle > -maxAngle)) {
-                        Matrix.rotateM(modelMatrix, 0, mAngle, arrowRotationAxis_x, arrowRotationAxis_y, arrowRotationAxis_z);
+                    if (i > rotationStartIndex && ((i - rotationStartIndex) * yRotateStride < mainMaxAngle && (i - rotationStartIndex) * yRotateStride > -mainMaxAngle)) {
+                        Matrix.rotateM(modelMatrix, 0, yRotateStride, arrowRotationAxis_x, arrowRotationAxis_y, arrowRotationAxis_z);
                         // 회전 각도 계산
-                        yAxisDegree += mAngle;
-                        yAxisDegree %= 360;
+                        yRotateDegree += yRotateStride;
+                        yRotateDegree %= 360;
                     }
 
                     // 하이라이트 화살표 메트릭스 초기화
                     System.arraycopy(modelMatrix, 0, highlightArrowModelMatrix, 0, 16);
                     // 최대 회전 각보다 작은 경우 stride 만큼 z축으로 회전. 사용자가 지정한 앵글의 부호에 따라 + / - 를 정해준다.
                     if (i > rotationStartIndex) {
-                        if (zSpinSum < zSpinLimit) {
-                            if (mAngle > 0)
-                                Matrix.rotateM(highlightArrowModelMatrix, 0, zSpinSum, 0.0f, 0.0f, 1.0f);
+                        if (zRotateDegree < zMaxAngle) {
+                            if (yRotateStride > 0)
+                                Matrix.rotateM(highlightArrowModelMatrix, 0, zRotateDegree, 0.0f, 0.0f, 1.0f);
                             else
-                                Matrix.rotateM(highlightArrowModelMatrix, 0, -zSpinSum, 0.0f, 0.0f, 1.0f);
-                            zSpinSum += zSpintStride;
+                                Matrix.rotateM(highlightArrowModelMatrix, 0, -zRotateDegree, 0.0f, 0.0f, 1.0f);
+                            zRotateDegree += zRotateStride;
                         } else {
-                            if (mAngle > 0)
-                                Matrix.rotateM(highlightArrowModelMatrix, 0, zSpinSum, 0.0f, 0.0f, 1.0f);
+                            if (yRotateStride > 0)
+                                Matrix.rotateM(highlightArrowModelMatrix, 0, zRotateDegree, 0.0f, 0.0f, 1.0f);
                             else
-                                Matrix.rotateM(highlightArrowModelMatrix, 0, -zSpinSum, 0.0f, 0.0f, 1.0f);
+                                Matrix.rotateM(highlightArrowModelMatrix, 0, -zRotateDegree, 0.0f, 0.0f, 1.0f);
                         }
                     }
 
                     // line coords 계산
                     if (coordsBufferIndex == rightLineCoords.length) break;
-                    rightLineCoords[coordsBufferIndex] = baseX + (lineStride * (float) Math.sin(Math.toRadians(90 + yAxisDegree)));
-                    leftLineCoords[coordsBufferIndex] = baseX + (lineStride * (float) Math.sin(Math.toRadians(-90 + yAxisDegree)));
-                    rightLineCoords[coordsBufferIndex + 2] = baseZ + (lineStride * (float) Math.cos(Math.toRadians(90 + yAxisDegree)));
-                    leftLineCoords[coordsBufferIndex + 2] = baseZ + (lineStride * (float) Math.cos(Math.toRadians(-90 + yAxisDegree)));
+                    rightLineCoords[coordsBufferIndex] = baseX + (lineStride * (float) Math.sin(Math.toRadians(90 + yRotateDegree)));
+                    leftLineCoords[coordsBufferIndex] = baseX + (lineStride * (float) Math.sin(Math.toRadians(-90 + yRotateDegree)));
+                    rightLineCoords[coordsBufferIndex + 2] = baseZ + (lineStride * (float) Math.cos(Math.toRadians(90 + yRotateDegree)));
+                    leftLineCoords[coordsBufferIndex + 2] = baseZ + (lineStride * (float) Math.cos(Math.toRadians(-90 + yRotateDegree)));
 
 
-                    baseX += drawStride * (float) Math.sin(Math.toRadians(yAxisDegree));
-                    baseZ += drawStride * (float) Math.cos(Math.toRadians(yAxisDegree));
+                    baseX += drawStride * (float) Math.sin(Math.toRadians(yRotateDegree));
+                    baseZ += drawStride * (float) Math.cos(Math.toRadians(yRotateDegree));
 
                     // index 증가
                     coordsBufferIndex += 3;
@@ -362,10 +388,10 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                 coordsBufferIndex = 0;
                 baseX = 0;
                 baseZ = 0;
-                yAxisDegree = 0;
+                yRotateDegree = 0;
                 drawStride = -0.3f;
 
-                zSpinSum = 0;
+                zRotateDegree = 0;
 
                 float triangleScale = 0.025f;
                 vertexStride = 3;
@@ -404,43 +430,43 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                 coordsBufferIndex = 0;
                 for (int i = 0; i < arrowNum; i++) {
 
-                    if (i > rotationStartIndex && ((i - rotationStartIndex) * mAngle < maxAngle && (i - rotationStartIndex) * mAngle > -maxAngle)) {
-                        Matrix.rotateM(modelMatrix, 0, mAngle, arrowRotationAxis_x, arrowRotationAxis_y, arrowRotationAxis_z);
+                    if (i > rotationStartIndex && ((i - rotationStartIndex) * yRotateStride < mainMaxAngle && (i - rotationStartIndex) * yRotateStride > -mainMaxAngle)) {
+                        Matrix.rotateM(modelMatrix, 0, yRotateStride, arrowRotationAxis_x, arrowRotationAxis_y, arrowRotationAxis_z);
 
                         // 회전 각도 계산
-                        yAxisDegree += mAngle;
-                        yAxisDegree %= 360;
+                        yRotateDegree += yRotateStride;
+                        yRotateDegree %= 360;
                     }
 
                     // 하이라이트 화살표 메트릭스 초기화
                     System.arraycopy(modelMatrix, 0, highlightArrowModelMatrix, 0, 16);
                     // 최대 회전 각보다 작은 경우 stride 만큼 z축으로 회전. 사용자가 지정한 앵글의 부호에 따라 + / - 를 정해준다.
                     if (i > rotationStartIndex) {
-                        if (zSpinSum < zSpinLimit) {
-                            if (mAngle > 0)
-                                Matrix.rotateM(highlightArrowModelMatrix, 0, zSpinSum, 0.0f, 0.0f, 1.0f);
+                        if (zRotateDegree < zMaxAngle) {
+                            if (yRotateStride > 0)
+                                Matrix.rotateM(highlightArrowModelMatrix, 0, zRotateDegree, 0.0f, 0.0f, 1.0f);
                             else
-                                Matrix.rotateM(highlightArrowModelMatrix, 0, -zSpinSum, 0.0f, 0.0f, 1.0f);
-                            zSpinSum += zSpintStride;
+                                Matrix.rotateM(highlightArrowModelMatrix, 0, -zRotateDegree, 0.0f, 0.0f, 1.0f);
+                            zRotateDegree += zRotateStride;
                         } else {
-                            if (mAngle > 0)
-                                Matrix.rotateM(highlightArrowModelMatrix, 0, zSpinSum, 0.0f, 0.0f, 1.0f);
+                            if (yRotateStride > 0)
+                                Matrix.rotateM(highlightArrowModelMatrix, 0, zRotateDegree, 0.0f, 0.0f, 1.0f);
                             else
-                                Matrix.rotateM(highlightArrowModelMatrix, 0, -zSpinSum, 0.0f, 0.0f, 1.0f);
+                                Matrix.rotateM(highlightArrowModelMatrix, 0, -zRotateDegree, 0.0f, 0.0f, 1.0f);
                         }
                     }
 
 
                     // line coords 계산
                     if (coordsBufferIndex == rightLineCoords.length) break;
-                    rightLineCoords[coordsBufferIndex] = baseX + (lineStride * (float) Math.sin(Math.toRadians(90 + yAxisDegree)));
-                    leftLineCoords[coordsBufferIndex] = baseX + (lineStride * (float) Math.sin(Math.toRadians(-90 + yAxisDegree)));
-                    rightLineCoords[coordsBufferIndex + 2] = baseZ + (lineStride * (float) Math.cos(Math.toRadians(90 + yAxisDegree)));
-                    leftLineCoords[coordsBufferIndex + 2] = baseZ + (lineStride * (float) Math.cos(Math.toRadians(-90 + yAxisDegree)));
+                    rightLineCoords[coordsBufferIndex] = baseX + (lineStride * (float) Math.sin(Math.toRadians(90 + yRotateDegree)));
+                    leftLineCoords[coordsBufferIndex] = baseX + (lineStride * (float) Math.sin(Math.toRadians(-90 + yRotateDegree)));
+                    rightLineCoords[coordsBufferIndex + 2] = baseZ + (lineStride * (float) Math.cos(Math.toRadians(90 + yRotateDegree)));
+                    leftLineCoords[coordsBufferIndex + 2] = baseZ + (lineStride * (float) Math.cos(Math.toRadians(-90 + yRotateDegree)));
 
 
-                    baseX += drawStride * (float) Math.sin(Math.toRadians(yAxisDegree));
-                    baseZ += drawStride * (float) Math.cos(Math.toRadians(yAxisDegree));
+                    baseX += drawStride * (float) Math.sin(Math.toRadians(yRotateDegree));
+                    baseZ += drawStride * (float) Math.cos(Math.toRadians(yRotateDegree));
 
                     // index 증가
                     coordsBufferIndex += 3;
@@ -512,22 +538,21 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     }
 
 
-    public float zSpinLimit = 0;
-    public float zSpintStride = 3.0f;
-    public float zSpinSum = 0;
-
-    public volatile float mAngle;
-
-    public float getAngle() {
-        return mAngle;
+    public float getyRotateStride() {
+        return yRotateStride;
     }
 
-    public void setAngle(float angle) {
-        Log.d(TAG, "setAngle: " + angle);
-        mAngle = angle % 360;
+    public void setyRotateStride(float yRotateStride) {
+        Log.d(TAG, "setyRotateStride: " + yRotateStride);
+        this.yRotateStride = yRotateStride;
 
     }
 
+    /**
+     * 카메라 포지션 변경.
+     * setLookAtM은 카메라 위치 뿐만 아닌 각도, 포커싱 포인트 등의 값을 가지고 있지만,
+     * eye 값만 변경해주기 때문에 해당 메서드는 포지션(만) 변경!
+     */
     public void updateCameraPosition() {
         // Position the eye in front of the origin.
         final float eyeX = 0.0f;
@@ -551,32 +576,32 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                 upX, upY, upZ);
     }
 
-    public void setLineColor(float r, float g, float b, float alpha) {
+    public void setLineColor(float r, float g, float b, float a) {
         lineDot.colorLine[0] = r;
         lineDot.colorLine[1] = g;
         lineDot.colorLine[2] = b;
-        lineDot.colorLine[3] = alpha;
+        lineDot.colorLine[3] = a;
     }
 
-    public void setHighlightColor(float r, float g, float b, float alpha) {
+    public void setHighlightColor(float r, float g, float b, float a) {
         lineDot.colorHighlightArrow[0] = r;
         lineDot.colorHighlightArrow[1] = g;
         lineDot.colorHighlightArrow[2] = b;
-        lineDot.colorHighlightArrow[3] = alpha;
+        lineDot.colorHighlightArrow[3] = a;
     }
 
-    public void setPattern1Color(float r, float g, float b, float alpha) {
+    public void setPattern1Color(float r, float g, float b, float a) {
         lineDot.color[0] = r;
         lineDot.color[1] = g;
         lineDot.color[2] = b;
-        lineDot.color[3] = alpha;
+        lineDot.color[3] = a;
     }
 
-    public void setPattern2Color(float r, float g, float b, float alpha) {
+    public void setPattern2Color(float r, float g, float b, float a) {
         lineDot.color1[0] = r;
         lineDot.color1[1] = g;
         lineDot.color1[2] = b;
-        lineDot.color1[3] = alpha;
+        lineDot.color1[3] = a;
     }
 
 
