@@ -23,7 +23,8 @@
         android:layout_alignParentEnd="true"
         android:background="#4f000000"
         android:orientation="vertical"
-        android:padding="5dp">
+        android:padding="5dp"
+        android:visibility="visible">
 
 
         <ScrollView
@@ -624,7 +625,6 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginEnd="10dp"
-                                    android:checked="true"
                                     android:text="Normal" />
 
                                 <RadioButton
@@ -643,6 +643,7 @@
                                     android:id="@+id/rb_draw_line_triangle"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:checked="true"
                                     android:text="Line Triangle" />
 
                             </RadioGroup>
@@ -843,33 +844,58 @@
 
     </LinearLayout>
 
-    <ImageButton
-        android:id="@+id/btn_show_log"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/baseline_visibility_off_black_36"
-        android:tag="invisible" />
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_angle_total"
+        <ImageButton
+            android:id="@+id/btn_show_log"
+            android:layout_width="@dimen/imageButtonSize"
+            android:layout_height="@dimen/imageButtonSize"
+            android:src="@drawable/baseline_visibility_off_black_36"
+            android:tag="invisible" />
+
+
+        <ScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:id="@+id/tbt_button_container"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:orientation="vertical" />
+
+
+        </ScrollView>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#ff0000"
-            android:textSize="16sp" />
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_angle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#ff0000"
-            android:textSize="16sp" />
+            <TextView
+                android:id="@+id/tv_angle_total"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#ff0000"
+                android:textSize="16sp" />
 
+            <TextView
+                android:id="@+id/tv_angle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#ff0000"
+                android:textSize="16sp" />
+
+        </LinearLayout>
     </LinearLayout>
+
 
 </RelativeLayout>

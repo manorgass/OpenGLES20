@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="tbt_button_image">
+        <item>@drawable/tbt_1</item>
+        <item>@drawable/tbt_2</item>
+        <item>@drawable/tbt_3</item>
+        <item>@drawable/tbt_4</item>
+        <item>@drawable/tbt_5</item>
+        <item>@drawable/tbt_6</item>
+        <item>@drawable/tbt_7</item>
+        <item>@drawable/tbt_8</item>
+        <item>@drawable/tbt_9</item>
+        <item>@drawable/tbt_10</item>
+        <item>@drawable/tbt_11</item>
+        <item>@drawable/tbt_12</item>
+        <item>@drawable/tbt_13</item>
+        <item>@drawable/tbt_14</item>
+        <item>@drawable/tbt_15</item>
+        <item>@drawable/tbt_16</item>
+        <item>@drawable/tbt_17</item>
+        <item>@drawable/tbt_18</item>
+    </array>
+</resources>

@@ -3,4 +3,5 @@
     <dimen name="cardViewPadding">10dp</dimen>
     <dimen name="cardViewMarginTop">10dp</dimen>
     <dimen name="buttonSize">40dp</dimen>
+    <dimen name="imageButtonSize">50dp</dimen>
 </resources>

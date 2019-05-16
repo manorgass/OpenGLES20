@@ -219,7 +219,7 @@ public class Triangle {
             0.1f, -0.5f, downZ
     };
 
-    // Set color with red, green, blue and alpha (opacity) values
+    // Set colorMaterialPattern1 with red, green, blue and alpha (opacity) values
     float color[] = {0.63671875f, 0.76953125f, 0.22265625f, 1.0f};
     float colorLine[] = {0.0f, 0.0f, 0.0f, 1f};
 
@@ -301,7 +301,7 @@ public class Triangle {
         // get handle to fragment shader's vColor member
         colorHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
 
-        // Set color for drawing the triangle
+        // Set colorMaterialPattern1 for drawing the triangle
         GLES20.glUniform4fv(colorHandle, 1, colorLine, 0);
 
         // get handle to shape's transformation matrix
